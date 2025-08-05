@@ -281,9 +281,10 @@ async function generatePDF(orderData) {
   console.log('🎅 Generating PDFs for order:', orderData.orderNumber);
   
   const browser = await puppeteer.launch({
-  headless: 'new',
-  executablePath: process.env.NODE_ENV === 'production' ? '/nix/store/*/bin/chromium' : undefined,
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
 });
 
   try {
@@ -425,4 +426,5 @@ async function generatePDF(orderData) {
 
 
 module.exports = { generatePDF };
+
 
