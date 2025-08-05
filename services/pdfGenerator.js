@@ -1,5 +1,4 @@
-const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');const path = require('path');
+const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const { processTemplate } = require('./templateEngine');
 
@@ -280,11 +279,9 @@ async function generateEnvelope(orderData, lilyWangBase64) {
 async function generatePDF(orderData) {
   console.log('🎅 Generating PDFs for order:', orderData.orderNumber);
   
-  const browser = await puppeteer.launch({
-  args: chromium.args,
-  defaultViewport: chromium.defaultViewport,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless,
+const browser = await puppeteer.launch({
+  headless: 'new',
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
 });
 
   try {
@@ -426,5 +423,6 @@ async function generatePDF(orderData) {
 
 
 module.exports = { generatePDF };
+
 
 
