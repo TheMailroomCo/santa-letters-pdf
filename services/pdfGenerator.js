@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const path = require('path');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');const path = require('path');
 const fs = require('fs').promises;
 const { processTemplate } = require('./templateEngine');
 
@@ -425,3 +425,4 @@ async function generatePDF(orderData) {
 
 
 module.exports = { generatePDF };
+
