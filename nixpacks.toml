@@ -1,0 +1,39 @@
+[phases.setup]
+nixPkgs = [
+  "nodejs_18", 
+  "python3",
+  "cairo",
+  "pango", 
+  "libjpeg",
+  "giflib",
+  "librsvg",
+  "xorg.libXcomposite",
+  "xorg.libXdamage", 
+  "xorg.libXrandr",
+  "xorg.libXss",
+  "xorg.libXtst",
+  "xorg.libxcb",
+  "xorg.libX11",
+  "xorg.libXext",
+  "xorg.libXfixes",
+  "xorg.libXrender",
+  "xorg.libXi",
+  "xorg.libXcursor",
+  "nspr",
+  "nss",
+  "cups",
+  "expat",
+  "dbus",
+  "atk",
+  "gtk3",
+  "gdk-pixbuf",
+  "libdrm",
+  "mesa",
+  "xorg.xvfb"
+]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[start]
+cmd = "npm start"
