@@ -1,5 +1,7 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 const fs = require('fs').promises;
+const path = require('path');
 const { processTemplate } = require('./templateEngine');
 
 // Convert file to base64
@@ -280,8 +282,11 @@ async function generatePDF(orderData) {
   console.log('🎅 Generating PDFs for order:', orderData.orderNumber);
   
 const browser = await puppeteer.launch({
-  headless: 'new',
-  args: ['--no-sandbox', '--disable-setuid-sandbox']
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+  ignoreHTTPSErrors: true,
 });
 
   try {
@@ -423,6 +428,7 @@ const browser = await puppeteer.launch({
 
 
 module.exports = { generatePDF };
+
 
 
 
