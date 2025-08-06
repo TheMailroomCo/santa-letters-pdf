@@ -369,9 +369,10 @@ const browser = await puppeteer.launch({
     });
 
     // Save letter PDF
-    const letterFilename = `order-${orderData.orderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
-    const letterFilepath = path.join(__dirname, '../output', letterFilename);
-    await fs.writeFile(letterFilepath, letterPdfBuffer);
+const cleanOrderNumber = orderData.orderNumber.replace('#', '');
+const letterFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
+const letterFilepath = path.join(__dirname, '../output', letterFilename);
+await fs.writeFile(letterFilepath, letterPdfBuffer);
 
     await letterPage.close();
 
@@ -394,10 +395,11 @@ const browser = await puppeteer.launch({
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
 
-    // Save envelope PDF
-    const envelopeFilename = `order-${orderData.orderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
-    const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
-    await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
+// Save envelope PDF
+const cleanOrderNumber = orderData.orderNumber.replace('#', '');
+const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
+const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
+await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
 
     await envelopePage.close();
 
@@ -428,6 +430,7 @@ const browser = await puppeteer.launch({
 
 
 module.exports = { generatePDF };
+
 
 
 
