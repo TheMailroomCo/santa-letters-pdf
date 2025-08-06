@@ -280,6 +280,9 @@ async function generateEnvelope(orderData, lilyWangBase64) {
 // Main PDF generation function (now generates both letter and envelope)
 async function generatePDF(orderData) {
   console.log('🎅 Generating PDFs for order:', orderData.orderNumber);
+   
+  // Declare cleanOrderNumber ONCE at the top
+  const cleanOrderNumber = orderData.orderNumber.replace('#', '');
   
 const browser = await puppeteer.launch({
   args: chromium.args,
@@ -369,10 +372,10 @@ const browser = await puppeteer.launch({
     });
 
     // Save letter PDF
-const cleanOrderNumber = orderData.orderNumber.replace('#', '');
-const letterFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
-const letterFilepath = path.join(__dirname, '../output', letterFilename);
-await fs.writeFile(letterFilepath, letterPdfBuffer);
+    const letterFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
+    const letterFilepath = path.join(__dirname, '../output', letterFilename);
+    await fs.writeFile(letterFilepath, letterPdfBuffer);
+
 
     await letterPage.close();
 
@@ -396,10 +399,9 @@ await fs.writeFile(letterFilepath, letterPdfBuffer);
     });
 
 // Save envelope PDF
-const cleanOrderNumber = orderData.orderNumber.replace('#', '');
 const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
-const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
-await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
+    const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
+    await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
 
     await envelopePage.close();
 
@@ -430,6 +432,7 @@ await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
 
 
 module.exports = { generatePDF };
+
 
 
 
