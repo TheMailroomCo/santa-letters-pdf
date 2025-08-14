@@ -112,7 +112,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 10pt;
       color: #333;
       position: absolute;
-      top: 20mm; /* Moved down 2mm from previous 18mm */
+      top: 21mm; /* Moved down 1mm more */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
@@ -145,18 +145,18 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       position: absolute;
       bottom: 0; /* Sits directly on the line */
       left: 18.232mm; /* Aligned with line start */
-      width: 50mm;
+      width: 50mm; /* Exact width for name box */
       text-align: center;
       line-height: 1;
     }
     
     /* Dynamic sizing for longer names */
     .child-name.long-name {
-      font-size: 10mm;
+      font-size: 11mm; /* For 11-15 characters */
     }
     
     .child-name.very-long-name {
-      font-size: 8mm;
+      font-size: 9mm; /* For 16-20 characters */
     }
     
     /* Message text */
@@ -168,19 +168,19 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       text-align: left;
       width: 68mm;
       position: absolute;
-      top: 30mm; /* Moved down 2mm from 28mm */
+      top: 31mm; /* Moved down 1mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
     }
     
-    /* "With Love," above Santa signature */
+    /* "With love," above Santa signature */
     .with-love {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
       color: #333;
       position: absolute;
-      bottom: 8mm; /* Moved up 2mm from 6mm (halfway back) */
+      bottom: 9mm; /* Moved up 1mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
@@ -216,7 +216,7 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
           <div class="name-line"></div>
         </div>
         <div class="message">${message}</div>
-        <div class="with-love">With Love,</div>
+        <div class="with-love">With love,</div>
         <div class="signature-space"></div>
       </div>
     </div>
