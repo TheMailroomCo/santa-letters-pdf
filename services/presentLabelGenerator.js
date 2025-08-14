@@ -109,8 +109,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-family: 'Griffiths', Georgia, serif;
       font-size: 10pt;
       color: #333;
-      margin-top: 3mm; /* Lower than before */
-      margin-bottom: 6mm; /* Space before the name/line */
+      position: absolute;
+      top: 18mm; /* Inline with the line position */
+      left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
@@ -118,7 +119,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     /* Container for name with line - positioned absolutely */
     .name-container {
       position: absolute;
-      top: 20mm; /* Position from top of sticker */
+      top: 18mm; /* Same as greeting to align with line */
       left: 14.377mm; /* Same as left padding */
       width: 68mm; /* Full width of text area */
       height: 10mm;
@@ -147,6 +148,15 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       line-height: 1;
     }
     
+    /* Dynamic sizing for longer names */
+    .child-name.long-name {
+      font-size: 10mm;
+    }
+    
+    .child-name.very-long-name {
+      font-size: 8mm;
+    }
+    
     /* Message text */
     .message {
       font-family: 'Griffiths', Georgia, serif;
@@ -155,8 +165,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       color: #333;
       text-align: left;
       width: 68mm;
-      margin-top: 12mm; /* Space for the name/line above */
-      margin-bottom: auto; /* Push remaining space between message and "With Love" */
+      position: absolute;
+      top: 28mm; /* Centered between name and "With Love" */
+      left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
     }
@@ -166,7 +177,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
       color: #333;
-      margin-bottom: 2mm; /* Slightly up from bottom */
+      position: absolute;
+      bottom: 6mm; /* Moved down from previous position */
+      left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
@@ -183,12 +196,21 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
   const css = await generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase64);
   
   // Create 8 stickers with the messages and personalized name
-  const stickersHTML = SANTA_MESSAGES.map((message, index) => `
+  const stickersHTML = SANTA_MESSAGES.map((message, index) => {
+    // Determine name length for dynamic sizing
+    let nameClass = '';
+    if (childName.length > 15) {
+      nameClass = 'very-long-name';
+    } else if (childName.length > 10) {
+      nameClass = 'long-name';
+    }
+    
+    return `
     <div class="sticker">
       <div class="sticker-content">
         <div class="greeting">My dearest</div>
         <div class="name-container">
-          <span class="child-name">${childName}</span>
+          <span class="child-name ${nameClass}">${childName}</span>
           <div class="name-line"></div>
         </div>
         <div class="message">${message}</div>
@@ -196,7 +218,8 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
         <div class="signature-space"></div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
   
   return `
     <!DOCTYPE html>
