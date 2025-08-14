@@ -85,6 +85,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       padding-right: 12.637mm;
       column-gap: 2.524mm;
       row-gap: 2.732mm;
+      overflow: hidden; /* Prevent any overflow */
     }
     
     .sticker {
@@ -93,8 +94,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       flex-direction: column;
       width: 95mm;
       height: 60mm;
-      padding: 10mm 13mm 10mm 14.377mm; /* top right bottom left - moved everything up */
-      overflow: hidden; /* Prevent text overflow to next page */
+      padding: 10mm 13mm 10mm 14.377mm;
+      overflow: hidden; /* Prevent text overflow */
+      page-break-inside: avoid; /* Prevent page breaks inside stickers */
     }
     
     .sticker-content {
@@ -110,7 +112,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 10pt;
       color: #333;
       position: absolute;
-      top: 18mm; /* Inline with the line position */
+      top: 20mm; /* Moved down 2mm from previous 18mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
@@ -119,9 +121,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     /* Container for name with line - positioned absolutely */
     .name-container {
       position: absolute;
-      top: 18mm; /* Same as greeting to align with line */
-      left: 14.377mm; /* Same as left padding */
-      width: 68mm; /* Full width of text area */
+      top: 18mm; /* Keep at 18mm for line position */
+      left: 14.377mm;
+      width: 68mm;
       height: 10mm;
     }
     
@@ -166,7 +168,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       text-align: left;
       width: 68mm;
       position: absolute;
-      top: 28mm; /* Centered between name and "With Love" */
+      top: 30mm; /* Moved down 2mm from 28mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
@@ -178,7 +180,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 9pt;
       color: #333;
       position: absolute;
-      bottom: 6mm; /* Moved down from previous position */
+      bottom: 8mm; /* Moved up 2mm from 6mm (halfway back) */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
