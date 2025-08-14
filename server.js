@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { generatePDF } = require('./services/pdfGenerator');
+const { generatePresentLabels } = require('./services/presentLabelGenerator');
 require('dotenv').config();
 
 const app = express();
@@ -18,7 +19,8 @@ app.get('/', (req, res) => {
   res.send(`
     <h1>🎅 Santa Letter PDF Generator</h1>
     <p>Server is running!</p>
-    <p><a href="/test">Run Tests</a></p>
+    <p><a href="/test">Run Letter Tests</a></p>
+    <p><a href="/test-labels">Test Present Labels</a></p>
   `);
 });
 
@@ -180,6 +182,51 @@ app.post('/generate-pdf', async (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+// New endpoint for present labels
+app.post('/generate-present-labels', async (req, res) => {
+  try {
+    console.log('🎁 Received present labels webhook:', JSON.stringify(req.body, null, 2));
+    
+    const result = await generatePresentLabels(req.body);
+    
+    res.json({
+      success: true,
+      filename: result.filename,
+      url: `${req.protocol}://${req.get('host')}${result.url}`
+    });
+  } catch (error) {
+    console.error('❌ Error generating present labels:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Test endpoint for present labels
+app.get('/test-labels', async (req, res) => {
+  const testData = {
+    orderNumber: "TEST001",
+    childName: "Sophie"
+  };
+  
+  try {
+    const result = await generatePresentLabels(testData);
+    res.send(`
+      <h1>🎁 Present Labels Test</h1>
+      <p>Generated successfully!</p>
+      <p><a href="${result.url}" target="_blank">View PDF</a></p>
+      <p><a href="/">Back to Home</a></p>
+    `);
+  } catch (error) {
+    res.send(`
+      <h1>Error</h1>
+      <p>${error.message}</p>
+      <p><a href="/">Back to Home</a></p>
+    `);
   }
 });
 
