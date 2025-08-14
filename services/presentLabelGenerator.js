@@ -79,13 +79,15 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: repeat(4, 1fr);
+      padding: 5mm; /* Outer margin of the sheet */
+      gap: 3mm; /* Space between stickers */
     }
     
     .sticker {
       position: relative;
       display: flex;
       flex-direction: column;
-      padding: 12mm 12mm 10mm 12mm; /* Adjust padding to position text within borders */
+      padding: 15mm 10mm 12mm 10mm; /* top right bottom left - adjust to fit within borders */
     }
     
     .sticker-content {
@@ -98,37 +100,56 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     /* "My dearest" text - positioned to align with line */
     .greeting {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 9pt;
+      font-size: 10pt;
       color: #333;
-      margin-top: 8mm; /* Position below the monogram */
-      margin-bottom: 1mm;
+      margin-top: 0;
+      margin-bottom: 0;
+      display: inline-block;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
-    /* Child's name - on the line after "My dearest" */
+    /* Container for name with underline */
+    .name-line {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 5mm;
+      position: relative;
+    }
+    
+    /* Child's name - larger and with underline */
     .child-name {
       font-family: 'LilyWang', cursive;
-      font-size: 16pt;
+      font-size: 20pt;
       color: #333;
-      margin-bottom: 4mm;
-      padding-left: 2mm; /* Slight indent for the name */
-      border-bottom: 1px solid transparent; /* Align with the printed line */
-      line-height: 1;
-      min-height: 8mm;
+      display: inline-block;
+      margin-left: 3mm;
+      position: relative;
+      line-height: 1.2;
+    }
+    
+    /* Underline for the name */
+    .child-name::after {
+      content: '';
+      position: absolute;
+      bottom: -1mm;
+      left: 0;
+      right: -10mm; /* Extend line beyond name */
+      height: 0.5pt;
+      background-color: #666;
     }
     
     /* Message text */
     .message {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 8.5pt;
-      line-height: 1.35;
+      font-size: 7.5pt;
+      line-height: 1.25;
       color: #333;
       text-align: left;
       flex-grow: 1;
-      margin-bottom: 3mm;
-      -webkit-text-stroke: 0.05pt #000000;
-      text-stroke: 0.05pt #000000;
+      margin-bottom: 2mm;
+      -webkit-text-stroke: 0.03pt #000000;
+      text-stroke: 0.03pt #000000;
     }
     
     /* "With Love," above Santa signature */
@@ -136,14 +157,14 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
       color: #333;
-      margin-bottom: 2mm;
+      margin-bottom: 0;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
     /* Spacing for the pre-printed Santa Claus signature */
     .signature-space {
-      height: 10mm; /* Reserve space for pre-printed signature */
+      height: 8mm; /* Reserve space for pre-printed signature */
     }
   `;
 }
@@ -156,8 +177,10 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
   const stickersHTML = SANTA_MESSAGES.map((message, index) => `
     <div class="sticker">
       <div class="sticker-content">
-        <div class="greeting">My dearest</div>
-        <div class="child-name">${childName}</div>
+        <div class="name-line">
+          <span class="greeting">My dearest</span>
+          <span class="child-name">${childName}</span>
+        </div>
         <div class="message">${message}</div>
         <div class="with-love">With Love,</div>
         <div class="signature-space"></div>
