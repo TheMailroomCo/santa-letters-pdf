@@ -77,17 +77,23 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       height: 251mm;
       z-index: 2;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: repeat(4, 1fr);
-      padding: 5mm; /* Outer margin of the sheet */
-      gap: 3mm; /* Space between stickers */
+      grid-template-columns: 95mm 95mm;
+      grid-template-rows: repeat(4, 60mm);
+      padding-top: 3.632mm;
+      padding-bottom: 3.632mm;
+      padding-left: 12.637mm;
+      padding-right: 12.637mm;
+      column-gap: 2.524mm;
+      row-gap: 2.732mm;
     }
     
     .sticker {
       position: relative;
       display: flex;
       flex-direction: column;
-      padding: 15mm 10mm 12mm 10mm; /* top right bottom left - adjust to fit within borders */
+      width: 95mm;
+      height: 60mm;
+      padding: 13mm 13mm 8.079mm 14.377mm; /* top right bottom left - exact measurements */
     }
     
     .sticker-content {
@@ -97,46 +103,47 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       flex-direction: column;
     }
     
-    /* "My dearest" text - positioned to align with line */
+    /* "My dearest" text */
     .greeting {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 10pt;
       color: #333;
-      margin-top: 0;
-      margin-bottom: 0;
-      display: inline-block;
+      margin-bottom: 1mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
-    /* Container for name with underline */
-    .name-line {
-      display: flex;
-      align-items: baseline;
+    /* Container for name with line */
+    .name-container {
+      position: relative;
+      width: 50mm;
       margin-bottom: 5mm;
-      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
     }
     
-    /* Child's name - larger and with underline */
-    .child-name {
-      font-family: 'LilyWang', cursive;
-      font-size: 20pt;
-      color: #333;
-      display: inline-block;
-      margin-left: 3mm;
-      position: relative;
-      line-height: 1.2;
-    }
-    
-    /* Underline for the name */
-    .child-name::after {
-      content: '';
+    /* The line under the name */
+    .name-line {
       position: absolute;
-      bottom: -1mm;
+      bottom: 0;
       left: 0;
-      right: -10mm; /* Extend line beyond name */
+      width: 50mm;
       height: 0.5pt;
       background-color: #666;
+    }
+    
+    /* Child's name - centered on the line */
+    .child-name {
+      font-family: 'LilyWang', cursive;
+      font-size: 14mm; /* Using your specified size */
+      color: #333;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+      padding-bottom: 1mm; /* Sits just above the line */
+      max-width: 50mm;
+      text-align: center;
     }
     
     /* Message text */
@@ -146,6 +153,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       line-height: 1.25;
       color: #333;
       text-align: left;
+      width: 68mm; /* Exact width you specified */
       flex-grow: 1;
       margin-bottom: 2mm;
       -webkit-text-stroke: 0.03pt #000000;
@@ -158,13 +166,14 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 9pt;
       color: #333;
       margin-bottom: 0;
+      margin-top: auto; /* Push to bottom of available space */
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
     /* Spacing for the pre-printed Santa Claus signature */
     .signature-space {
-      height: 8mm; /* Reserve space for pre-printed signature */
+      height: 0; /* No extra space needed since padding handles it */
     }
   `;
 }
@@ -177,9 +186,10 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
   const stickersHTML = SANTA_MESSAGES.map((message, index) => `
     <div class="sticker">
       <div class="sticker-content">
-        <div class="name-line">
-          <span class="greeting">My dearest</span>
+        <div class="greeting">My dearest</div>
+        <div class="name-container">
           <span class="child-name">${childName}</span>
+          <div class="name-line"></div>
         </div>
         <div class="message">${message}</div>
         <div class="with-love">With Love,</div>
