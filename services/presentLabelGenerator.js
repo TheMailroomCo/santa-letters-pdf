@@ -93,7 +93,8 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       flex-direction: column;
       width: 95mm;
       height: 60mm;
-      padding: 13mm 13mm 8.079mm 14.377mm; /* top right bottom left - exact measurements */
+      padding: 10mm 13mm 10mm 14.377mm; /* top right bottom left - moved everything up */
+      overflow: hidden; /* Prevent text overflow to next page */
     }
     
     .sticker-content {
@@ -108,42 +109,42 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-family: 'Griffiths', Georgia, serif;
       font-size: 10pt;
       color: #333;
-      margin-bottom: 1mm;
+      margin-top: 3mm; /* Lower than before */
+      margin-bottom: 6mm; /* Space before the name/line */
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
-    /* Container for name with line */
+    /* Container for name with line - positioned absolutely */
     .name-container {
-      position: relative;
-      width: 50mm;
-      margin-bottom: 5mm;
-      display: flex;
-      justify-content: center;
-      align-items: baseline;
+      position: absolute;
+      top: 20mm; /* Position from top of sticker */
+      left: 14.377mm; /* Same as left padding */
+      width: 68mm; /* Full width of text area */
+      height: 10mm;
     }
     
     /* The line under the name */
     .name-line {
       position: absolute;
-      bottom: 0;
-      left: 0;
+      bottom: 4mm;
+      left: 18.232mm; /* 32.609mm from edge minus the 14.377mm padding */
       width: 50mm;
       height: 0.5pt;
       background-color: #666;
     }
     
-    /* Child's name - centered on the line */
+    /* Child's name - sits ON the line */
     .child-name {
       font-family: 'LilyWang', cursive;
-      font-size: 14mm; /* Using your specified size */
+      font-size: 14mm;
       color: #333;
-      line-height: 1;
-      position: relative;
-      z-index: 1;
-      padding-bottom: 1mm; /* Sits just above the line */
-      max-width: 50mm;
+      position: absolute;
+      bottom: 0; /* Sits directly on the line */
+      left: 18.232mm; /* Aligned with line start */
+      width: 50mm;
       text-align: center;
+      line-height: 1;
     }
     
     /* Message text */
@@ -153,9 +154,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       line-height: 1.25;
       color: #333;
       text-align: left;
-      width: 68mm; /* Exact width you specified */
-      flex-grow: 1;
-      margin-bottom: 2mm;
+      width: 68mm;
+      margin-top: 12mm; /* Space for the name/line above */
+      margin-bottom: auto; /* Push remaining space between message and "With Love" */
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
     }
@@ -165,8 +166,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
       color: #333;
-      margin-bottom: 0;
-      margin-top: auto; /* Push to bottom of available space */
+      margin-bottom: 2mm; /* Slightly up from bottom */
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
