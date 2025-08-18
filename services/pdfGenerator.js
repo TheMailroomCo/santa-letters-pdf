@@ -79,6 +79,7 @@ function getTemplateFilename(templateName, letterYear, letterType) {
 
 // Convert string to kebab-case
 function kebabCase(str) {
+  if (!str) return '';  // This fixes the null error
   return str
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -556,6 +557,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
