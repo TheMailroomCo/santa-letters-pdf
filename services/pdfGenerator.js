@@ -36,7 +36,23 @@ async function loadCSS(griffithsBase64, lilyWangBase64) {
 }
 
 // Convert Shopify template name to GitHub filename
-function getTemplateFilename(templateName, letterYear) {
+function getTemplateFilename(templateName, letterYear, letterType) {
+  // Handle letter types that don't use template field
+  if (!templateName || templateName === '') {
+    if (letterType === 'Write Your Own Letter') {
+      return 'write-your-own.html';
+    }
+    if (letterType === 'Family Letter') {
+      return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
+    }
+    if (letterType === 'Baby\'s First Christmas') {
+      return 'babys-first-christmas.html';
+    }
+    if (letterType === 'Non-Believer Letter') {
+      return 'non-believer-letter.html';
+    }
+  }
+  
   // Handle special cases first
   if (templateName === 'Family Letter') {
     return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
@@ -49,13 +65,13 @@ function getTemplateFilename(templateName, letterYear) {
     'The Brave One': 'the-brave-one.html',
     'Royal Winter Gala': 'royal-winter-gala.html',
     'Magic and Stardust': 'magic-and-stardust.html',
-    'Magic & Stardust': 'magic-and-stardust.html', // Handle both variations
+    'Magic & Stardust': 'magic-and-stardust.html',
     'The Watchful Elf': 'the-watchful-elf.html',
     'The Helpful Reindeer': 'the-helpful-reindeer.html',
     'The Night Sky': 'the-night-sky.html',
     "Baby's First Christmas": 'babys-first-christmas.html',
     'Non-Believer Letter': 'non-believer-letter.html',
-    'Write Your Own Letter': 'write-your-own.html' // Corrected filename
+    'Write Your Own Letter': 'write-your-own.html'
   };
 
   return templateMap[templateName] || kebabCase(templateName) + '.html';
@@ -540,3 +556,4 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
