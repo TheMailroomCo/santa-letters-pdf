@@ -163,29 +163,32 @@ function processTemplateContent(templateHtml, orderData) {
   });
   
   // Handle custom content for "Write Your Own Letter"
-if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
-  // First, check what we're receiving
-  console.log('Raw achievement:', orderData.achievement);
+  if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
+    // First, check what we're receiving
+    console.log('🔍 Raw achievement:', orderData.achievement);
+    
+    // The achievement field contains <br> tags from Make.com
+    let content = orderData.achievement;
+    
+    // Split into paragraphs (by double line breaks)
+    const paragraphs = content
+      .split(/<br>\s*<br>/)  // Split on <br><br> with optional spaces
+      .filter(p => p.trim())  // Remove empty paragraphs
+      .map(p => {
+        // Each paragraph keeps single <br> for line breaks within
+        return `<p>${p.trim()}</p>`;
+      })
+      .join('\n');
+    
+    console.log('📝 Generated paragraphs:', paragraphs);
+    console.log('📊 Number of paragraphs created:', paragraphs.split('</p>').length - 1);
+    
+    // Don't escape - we want the HTML to render
+    processedHtml = processedHtml.replace('{achievement}', paragraphs);
+    return processedHtml;  // Return early for Write Your Own
+  }
   
-  // The achievement might have literal <br> text, not HTML breaks
-  // Split by <br><br> for paragraphs, or by double spaces
-  let content = orderData.achievement;
-  
-  // Split into paragraphs (by double line breaks)
-  const paragraphs = content
-    .split(/<br>\s*<br>/)  // Split on <br><br> with optional spaces
-    .filter(p => p.trim())
-    .map(p => {
-      // Each paragraph keeps single <br> for line breaks within
-      return `<p>${p.trim()}</p>`;
-    })
-    .join('\n');
-  
-  console.log('Generated paragraphs:', paragraphs);
-  
-  // Don't escape - we want the HTML to render
-  processedHtml = processedHtml.replace('{achievement}', paragraphs);
-  return processedHtml;
+  return processedHtml;  // Return for all other letter types
 }
 
 // Escape HTML special characters
@@ -507,7 +510,7 @@ async function generatePDF(orderData) {
     const year = orderData.letterYear || '2025';
 
     // Build letter HTML
-const letterHtml = `
+    const letterHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -543,16 +546,20 @@ const letterHtml = `
   </script>
 </body>
 </html>
-`;
+    `;
 
-// ADD THIS DEBUG LINE:
-if (orderData.letterType === 'Write Your Own Letter') {
-  console.log('🎨 Font class being used:', fontClass);
-  console.log('📄 Letter content HTML:', letterContent.substring(0, 500));
-  console.log('✅ Full HTML includes letter-content div:', letterHtml.includes('class="letter-content"'));
-}
+    // CSS DEBUG CODE for Write Your Own
+    if (orderData.letterType === 'Write Your Own Letter') {
+      console.log('🎨 CSS Debug for Write Your Own:');
+      console.log('  Font class being used:', fontClass);
+      console.log('  Font value from order:', orderData.font);
+      console.log('  Letter content preview (first 500 chars):', letterContent.substring(0, 500));
+      console.log('  Letter content includes <p> tags:', letterContent.includes('<p>'));
+      console.log('  Full HTML includes letter-content div:', letterHtml.includes('class="letter-content"'));
+      console.log('  Font class in container:', letterHtml.includes(`class="letter-container ${fontClass}"`));
+    }
 
-// Ensure output directory exists
+    // Ensure output directory exists
     const outputDir = path.join(__dirname, '../output');
     await fs.mkdir(outputDir, { recursive: true });
     console.log('📁 Output directory ready:', outputDir);
@@ -633,15 +640,3 @@ if (orderData.letterType === 'Write Your Own Letter') {
 }
 
 module.exports = { generatePDF };
-
-
-
-
-
-
-
-
-
-
-
-
