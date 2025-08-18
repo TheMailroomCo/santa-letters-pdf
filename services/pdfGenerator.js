@@ -523,8 +523,17 @@ async function generatePDF(orderData) {
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
     
+    // Create a clean filename using letterName, childrenNames, familyNames, or "Unknown" as fallback
+    const nameForFile = orderData.letterName || orderData.childrenNames || orderData.familyNames || orderData.childName || 'Unknown';
+    const nameClean = nameForFile
+      .replace(/[^a-z0-9]/gi, '-')  // Replace non-alphanumeric with dashes
+      .replace(/-+/g, '-')           // Replace multiple dashes with single
+      .replace(/^-|-$/g, '')         // Remove leading/trailing dashes
+      .toLowerCase()
+      .substring(0, 50);             // Limit length
+    
     // Save letter PDF
-    const letterFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
+    const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
     const letterFilepath = path.join(__dirname, '../output', letterFilename);
     await fs.writeFile(letterFilepath, letterPdfBuffer);
     console.log('✅ Letter PDF saved to:', letterFilepath);
@@ -548,8 +557,8 @@ async function generatePDF(orderData) {
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
     
-    // Save envelope PDF
-    const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
+    // Save envelope PDF (using same nameClean from above)
+    const envelopeFilename = `order-${cleanOrderNumber}-${nameClean}-envelope.pdf`;
     const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
     await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
     console.log('✅ Envelope PDF saved to:', envelopeFilepath);
@@ -580,6 +589,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
