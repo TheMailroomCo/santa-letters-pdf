@@ -103,7 +103,24 @@ async function fetchTemplate(templateFilename) {
 // Process template with data placeholders
 function processTemplateContent(templateHtml, orderData) {
   let processedHtml = templateHtml;
-
+  
+  // Process pronouns based on parentPronouns field
+  let pronouns = {
+    they: 'They',
+    their: 'their',
+    Their: 'Their'
+  };
+  
+  // If single parent, use their pronouns
+  if (orderData.parentPronouns) {
+    if (orderData.parentPronouns.includes('she')) {
+      pronouns = { they: 'She', their: 'her', Their: 'Her' };
+    } else if (orderData.parentPronouns.includes('he')) {
+      pronouns = { they: 'He', their: 'his', Their: 'His' };
+    }
+    // Keep default they/their if pronouns are they/them or not specified
+  }
+  
   // Map of placeholders to data fields
   const placeholderMap = {
     '{name}': orderData.childName || orderData.letterName || '',
@@ -124,9 +141,12 @@ function processTemplateContent(templateHtml, orderData) {
     '{characteristics}': orderData.characteristics || '',
     '{letterYear}': orderData.letterYear || '2025',
     '{font}': orderData.font || '',  // No default - should come from Shopify (Fancy or Block)
-    '{envelopeColor}': orderData.envelopeColor || ''  // No default - should come from Shopify (Red or Green)
+    '{envelopeColor}': orderData.envelopeColor || '',  // No default - should come from Shopify (Red or Green)
+    '{pronoun_They}': pronouns.they,
+    '{pronoun_their}': pronouns.their,
+    '{pronoun_Their}': pronouns.Their
   };
-
+  
   // Replace all placeholders
   Object.entries(placeholderMap).forEach(([placeholder, value]) => {
     // Escape special characters in the value for HTML
@@ -134,12 +154,12 @@ function processTemplateContent(templateHtml, orderData) {
     const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
     processedHtml = processedHtml.replace(regex, escapedValue);
   });
-
+  
   // Handle custom content for "Write Your Own Letter"
   if (orderData.letterType === 'Write Your Own Letter' && orderData.customerNotes) {
     processedHtml = processedHtml.replace('{customContent}', escapeHtml(orderData.customerNotes));
   }
-
+  
   return processedHtml;
 }
 
@@ -557,6 +577,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
