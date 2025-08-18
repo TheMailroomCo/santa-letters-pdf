@@ -508,53 +508,56 @@ async function generatePDF(orderData) {
 </html>
     `;
 
+// Ensure output directory exists
+    const outputDir = path.join(__dirname, '../output');
+    await fs.mkdir(outputDir, { recursive: true });
+    console.log('📁 Output directory ready:', outputDir);
+
     // Set content and generate letter PDF
     await letterPage.setContent(letterHtml, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 1000));
-
     const letterPdfBuffer = await letterPage.pdf({
       width: '180mm',
       height: '240mm',
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
-
+    
     // Save letter PDF
     const letterFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-letter.pdf`;
     const letterFilepath = path.join(__dirname, '../output', letterFilename);
     await fs.writeFile(letterFilepath, letterPdfBuffer);
-
+    console.log('✅ Letter PDF saved to:', letterFilepath);
+    console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
     await letterPage.close();
-
+    
     // === GENERATE ENVELOPE ===
     const envelopePage = await browser.newPage();
     await envelopePage.setViewport({
       width: 718,  // 190mm at 96 DPI
       height: 491  // 130mm at 96 DPI
     });
-
     const envelopeHtml = await generateEnvelope(orderData, lilyWangBase64);
     
     await envelopePage.setContent(envelopeHtml, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 500));
-
     const envelopePdfBuffer = await envelopePage.pdf({
       width: '190mm',
       height: '130mm',
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
-
+    
     // Save envelope PDF
     const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
     const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
     await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
-
+    console.log('✅ Envelope PDF saved to:', envelopeFilepath);
+    console.log('📄 Envelope file size:', envelopePdfBuffer.length, 'bytes');
     await envelopePage.close();
-
-    console.log('✅ Letter PDF generated:', letterFilename);
-    console.log('✅ Envelope PDF generated:', envelopeFilename);
-
+    
+    console.log('✅ Both PDFs generated successfully');
+    
     return {
       success: true,
       letter: {
@@ -568,7 +571,6 @@ async function generatePDF(orderData) {
         url: `/pdfs/${envelopeFilename}`
       }
     };
-
   } catch (error) {
     console.error('❌ PDF Generation Error:', error);
     throw error;
