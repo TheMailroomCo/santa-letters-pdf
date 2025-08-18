@@ -45,7 +45,8 @@ function getTemplateFilename(templateName, letterYear, letterType) {
     if (letterType === 'Family Letter') {
       return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
     }
-    if (letterType === 'Baby\'s First Christmas') {
+    // FIX: Add both possible values for Baby's First Christmas
+    if (letterType === 'Baby\'s First Christmas' || letterType === 'First Christmas Letter') {
       return 'babys-first-christmas.html';
     }
     if (letterType === 'Non-Believer Letter') {
@@ -73,7 +74,7 @@ function getTemplateFilename(templateName, letterYear, letterType) {
     'Non-Believer Letter': 'non-believer-letter.html',
     'Write Your Own Letter': 'write-your-own.html'
   };
-
+  
   return templateMap[templateName] || kebabCase(templateName) + '.html';
 }
 
@@ -577,6 +578,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
