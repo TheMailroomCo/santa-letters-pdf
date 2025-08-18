@@ -164,18 +164,27 @@ function processTemplateContent(templateHtml, orderData) {
   
   // Handle custom content for "Write Your Own Letter"
 if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
-  // Split by double <br> to create paragraphs
-  const paragraphs = orderData.achievement
-    .split('<br><br>')
-    .filter(p => p.trim()) // Remove empty paragraphs
-    .map(p => `<p>${p}</p>`)
-    .join('');
+  // First, check what we're receiving
+  console.log('Raw achievement:', orderData.achievement);
   
-  // Replace without escaping since we want the HTML to render
+  // The achievement might have literal <br> text, not HTML breaks
+  // Split by <br><br> for paragraphs, or by double spaces
+  let content = orderData.achievement;
+  
+  // Split into paragraphs (by double line breaks)
+  const paragraphs = content
+    .split(/<br>\s*<br>/)  // Split on <br><br> with optional spaces
+    .filter(p => p.trim())
+    .map(p => {
+      // Each paragraph keeps single <br> for line breaks within
+      return `<p>${p.trim()}</p>`;
+    })
+    .join('\n');
+  
+  console.log('Generated paragraphs:', paragraphs);
+  
+  // Don't escape - we want the HTML to render
   processedHtml = processedHtml.replace('{achievement}', paragraphs);
-  return processedHtml; // Return early to skip normal escaping
-}
-  
   return processedHtml;
 }
 
@@ -617,6 +626,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
