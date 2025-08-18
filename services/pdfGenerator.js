@@ -434,7 +434,7 @@ async function generatePDF(orderData) {
     const styles = await loadCSS(griffithsBase64, lilyWangBase64);
 
     // FETCH TEMPLATE FROM GITHUB
-    const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear);
+        const templateFilename = getTemplateFilename(ordeconst templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);rData.template, orderData.letterYear);
     console.log(`📄 Using template: ${templateFilename}`);
     const templateHtml = await fetchTemplate(templateFilename);
     
@@ -556,4 +556,5 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
