@@ -174,6 +174,19 @@ function processTemplateContent(templateHtml, orderData) {
 function escapeHtml(text) {
   if (!text) return '';
   
+  // Check if this text has <br> tags that should be preserved
+  if (text.includes('<br>')) {
+    return text
+      .replace(/<br>/g, '|||LINEBREAK|||')  // Temporarily hide <br>
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/\|\|\|LINEBREAK\|\|\|/g, '<br>');  // Restore <br>
+  }
+  
+  // Normal escaping for other fields
   const map = {
     '&': '&amp;',
     '<': '&lt;',
@@ -182,7 +195,7 @@ function escapeHtml(text) {
     "'": '&#39;'
   };
   
-  return text.toString().replace(/[&<>"']/g, m => map[m]);
+  return text.replace(/[&<>"']/g, m => map[m]);
 }
 
 // Dynamic text sizing script for letters
@@ -595,6 +608,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
