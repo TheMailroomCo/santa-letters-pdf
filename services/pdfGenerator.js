@@ -350,11 +350,11 @@ function getDynamicSizingScript() {
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           // IMPORTANT: Preserve font family and text stroke for block font
           if (isBlockFont) {
-            p.style.fontFamily = "'Griffiths', Georgia, serif";
+            p.style.fontFamily = 'Griffiths, Georgia, serif';
             p.style.webkitTextStroke = '0.142pt #000000';
             p.style.textStroke = '0.142pt #000000';
           } else if (isFancy) {
-            p.style.fontFamily = "'LilyWang', cursive";
+            p.style.fontFamily = 'LilyWang, cursive';
           }
         });
         
@@ -385,11 +385,11 @@ function getDynamicSizingScript() {
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         // IMPORTANT: Apply font family and stroke
         if (isBlockFont) {
-          p.style.fontFamily = "'Griffiths', Georgia, serif";
+          p.style.fontFamily = 'Griffiths, Georgia, serif';
           p.style.webkitTextStroke = '0.142pt #000000';
           p.style.textStroke = '0.142pt #000000';
         } else if (isFancy) {
-          p.style.fontFamily = "'LilyWang', cursive";
+          p.style.fontFamily = 'LilyWang, cursive';
         }
       });
       
@@ -405,11 +405,11 @@ function getDynamicSizingScript() {
           
           // Apply font styles to P.S. as well
           if (isBlockFont) {
-            psText.style.fontFamily = "'Griffiths', Georgia, serif";
+            psText.style.fontFamily = 'Griffiths, Georgia, serif';
             psText.style.webkitTextStroke = '0.142pt #000000';
             psText.style.textStroke = '0.142pt #000000';
           } else if (isFancy) {
-            psText.style.fontFamily = "'LilyWang', cursive";
+            psText.style.fontFamily = 'LilyWang, cursive';
           }
           
           // Check if it overflows after a brief delay
