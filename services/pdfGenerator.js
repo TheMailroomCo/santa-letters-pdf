@@ -42,10 +42,15 @@ function getTemplateFilename(templateName, letterYear, letterType) {
     if (letterType === 'Write Your Own Letter') {
       return 'write-your-own.html';
     }
-    if (letterType === 'Family Letter') {
-      return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
+    // Check if letterType contains "Family Letter"
+    if (letterType && letterType.includes('Family Letter')) {
+      // Check if it's backdated based on the letterType string
+      if (letterType.includes('Backdated')) {
+        return 'family-letter-backdated.html';
+      }
+      return 'family-letter.html';
     }
-    // FIX: Add both possible values for Baby's First Christmas
+    // Check for both variations of Baby's First
     if (letterType === 'Baby\'s First Christmas' || letterType === 'First Christmas Letter') {
       return 'babys-first-christmas.html';
     }
@@ -56,7 +61,7 @@ function getTemplateFilename(templateName, letterYear, letterType) {
   
   // Handle special cases first
   if (templateName === 'Family Letter') {
-    return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
+    return 'family-letter.html';
   }
   
   // Convert template name to kebab-case filename
@@ -72,7 +77,8 @@ function getTemplateFilename(templateName, letterYear, letterType) {
     'The Night Sky': 'the-night-sky.html',
     "Baby's First Christmas": 'babys-first-christmas.html',
     'Non-Believer Letter': 'non-believer-letter.html',
-    'Write Your Own Letter': 'write-your-own.html'
+    'Write Your Own Letter': 'write-your-own.html',
+    'Write Your Own': 'write-your-own.html'
   };
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
@@ -589,6 +595,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
