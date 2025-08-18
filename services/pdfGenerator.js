@@ -2,7 +2,10 @@ const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium');
 const fs = require('fs').promises;
 const path = require('path');
-const { processTemplate } = require('./templateEngine');
+const axios = require('axios');
+
+// GitHub repository base URL for templates
+const GITHUB_TEMPLATE_BASE = 'https://raw.githubusercontent.com/TheMailroomCo/santa-letters-pdf/main/templates/';
 
 // Convert file to base64
 async function fileToBase64(filePath) {
@@ -30,6 +33,112 @@ async function loadCSS(griffithsBase64, lilyWangBase64) {
     console.error('Error loading CSS:', error);
     return '';
   }
+}
+
+// Convert Shopify template name to GitHub filename
+function getTemplateFilename(templateName, letterYear) {
+  // Handle special cases first
+  if (templateName === 'Family Letter') {
+    return letterYear === '2025' ? 'family-letter.html' : 'family-letter-backdated.html';
+  }
+  
+  // Convert template name to kebab-case filename
+  const templateMap = {
+    'The Grand Library of Kind Hearts': 'the-grand-library-of-kind-hearts.html',
+    'Snow Globe Heart': 'snow-globe-heart.html',
+    'The Brave One': 'the-brave-one.html',
+    'Royal Winter Gala': 'royal-winter-gala.html',
+    'Magic and Stardust': 'magic-and-stardust.html',
+    'Magic & Stardust': 'magic-and-stardust.html', // Handle both variations
+    'The Watchful Elf': 'the-watchful-elf.html',
+    'The Helpful Reindeer': 'the-helpful-reindeer.html',
+    'The Night Sky': 'the-night-sky.html',
+    "Baby's First Christmas": 'babys-first-christmas.html',
+    'Non-Believer Letter': 'non-believer-letter.html',
+    'Write Your Own Letter': 'write-your-own.html' // Corrected filename
+  };
+
+  return templateMap[templateName] || kebabCase(templateName) + '.html';
+}
+
+// Convert string to kebab-case
+function kebabCase(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Fetch template from GitHub
+async function fetchTemplate(templateFilename) {
+  try {
+    const url = `${GITHUB_TEMPLATE_BASE}${templateFilename}`;
+    console.log(`🌐 Fetching template from GitHub: ${url}`);
+    
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Error fetching template ${templateFilename}:`, error.message);
+    throw new Error(`Failed to fetch template: ${templateFilename}`);
+  }
+}
+
+// Process template with data placeholders
+function processTemplateContent(templateHtml, orderData) {
+  let processedHtml = templateHtml;
+
+  // Map of placeholders to data fields
+  const placeholderMap = {
+    '{name}': orderData.childName || orderData.letterName || '',
+    '{childName}': orderData.childName || '',
+    '{letterName}': orderData.letterName || '',
+    '{achievement}': orderData.achievement || '',
+    '{location}': orderData.location || '',
+    '{magicalAddress}': orderData.magicalAddress || '',
+    '{psMessage}': orderData.psMessage || '',
+    '{familyAchievement}': orderData.familyAchievement || '',
+    '{actOfKindness}': orderData.actOfKindness || '',
+    '{familyNames}': orderData.familyNames || '',
+    '{childrenNames}': orderData.childrenNames || '',
+    '{familyLastName}': orderData.familyLastName || '',
+    '{parentsNames}': orderData.parentsNames || '',
+    '{parentPronouns}': orderData.parentPronouns || '',
+    '{numberOfChristmases}': orderData.numberOfChristmases || '',
+    '{characteristics}': orderData.characteristics || '',
+    '{letterYear}': orderData.letterYear || '2025',
+    '{font}': orderData.font || '',  // No default - should come from Shopify (Fancy or Block)
+    '{envelopeColor}': orderData.envelopeColor || ''  // No default - should come from Shopify (Red or Green)
+  };
+
+  // Replace all placeholders
+  Object.entries(placeholderMap).forEach(([placeholder, value]) => {
+    // Escape special characters in the value for HTML
+    const escapedValue = escapeHtml(value);
+    const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
+    processedHtml = processedHtml.replace(regex, escapedValue);
+  });
+
+  // Handle custom content for "Write Your Own Letter"
+  if (orderData.letterType === 'Write Your Own Letter' && orderData.customerNotes) {
+    processedHtml = processedHtml.replace('{customContent}', escapeHtml(orderData.customerNotes));
+  }
+
+  return processedHtml;
+}
+
+// Escape HTML special characters
+function escapeHtml(text) {
+  if (!text) return '';
+  
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  
+  return text.toString().replace(/[&<>"']/g, m => map[m]);
 }
 
 // Dynamic text sizing script for letters
@@ -145,7 +254,7 @@ async function loadEnvelopeCSS(lilyWangBase64) {
   }
 }
 
-// Script to handle dynamic centering of envelope text (keeping improved positioning)
+// Script to handle dynamic centering of envelope text
 function getEnvelopeScript() {
   return `
     // Center text vertically while keeping improved positioning logic
@@ -284,13 +393,13 @@ async function generatePDF(orderData) {
   // Declare cleanOrderNumber ONCE at the top
   const cleanOrderNumber = orderData.orderNumber.replace('#', '');
   
-const browser = await puppeteer.launch({
-  args: chromium.args,
-  defaultViewport: chromium.defaultViewport,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless,
-  ignoreHTTPSErrors: true,
-});
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
+  });
 
   try {
     // Load all assets as base64
@@ -308,12 +417,13 @@ const browser = await puppeteer.launch({
     // Load CSS with fonts embedded
     const styles = await loadCSS(griffithsBase64, lilyWangBase64);
 
-    // Get processed template content
-    const letterContent = processTemplate(orderData.template, {
-      name: orderData.letterName || orderData.childName,
-      achievement: orderData.achievement,
-      location: orderData.location
-    });
+    // FETCH TEMPLATE FROM GITHUB
+    const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear);
+    console.log(`📄 Using template: ${templateFilename}`);
+    const templateHtml = await fetchTemplate(templateFilename);
+    
+    // Process template content with order data
+    const letterContent = processTemplateContent(templateHtml, orderData);
 
     // Determine font class
     const fontClass = orderData.font === 'Fancy' ? 'fancy-font' : 'block-font';
@@ -376,7 +486,6 @@ const browser = await puppeteer.launch({
     const letterFilepath = path.join(__dirname, '../output', letterFilename);
     await fs.writeFile(letterFilepath, letterPdfBuffer);
 
-
     await letterPage.close();
 
     // === GENERATE ENVELOPE ===
@@ -398,8 +507,8 @@ const browser = await puppeteer.launch({
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
 
-// Save envelope PDF
-const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
+    // Save envelope PDF
+    const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber || '1'}-envelope.pdf`;
     const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
     await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
 
@@ -430,11 +539,4 @@ const envelopeFilename = `order-${cleanOrderNumber}-item-${orderData.itemNumber 
   }
 }
 
-
 module.exports = { generatePDF };
-
-
-
-
-
-
