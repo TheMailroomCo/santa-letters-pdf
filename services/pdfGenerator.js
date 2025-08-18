@@ -507,7 +507,7 @@ async function generatePDF(orderData) {
     const year = orderData.letterYear || '2025';
 
     // Build letter HTML
-    const letterHtml = `
+const letterHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -543,7 +543,14 @@ async function generatePDF(orderData) {
   </script>
 </body>
 </html>
-    `;
+`;
+
+// ADD THIS DEBUG LINE:
+if (orderData.letterType === 'Write Your Own Letter') {
+  console.log('🎨 Font class being used:', fontClass);
+  console.log('📄 Letter content HTML:', letterContent.substring(0, 500));
+  console.log('✅ Full HTML includes letter-content div:', letterHtml.includes('class="letter-content"'));
+}
 
 // Ensure output directory exists
     const outputDir = path.join(__dirname, '../output');
@@ -626,6 +633,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
