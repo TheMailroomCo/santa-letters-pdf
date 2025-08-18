@@ -163,9 +163,18 @@ function processTemplateContent(templateHtml, orderData) {
   });
   
   // Handle custom content for "Write Your Own Letter"
-  if (orderData.letterType === 'Write Your Own Letter' && orderData.customerNotes) {
-    processedHtml = processedHtml.replace('{customContent}', escapeHtml(orderData.customerNotes));
-  }
+if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
+  // Split by double <br> to create paragraphs
+  const paragraphs = orderData.achievement
+    .split('<br><br>')
+    .filter(p => p.trim()) // Remove empty paragraphs
+    .map(p => `<p>${p}</p>`)
+    .join('');
+  
+  // Replace without escaping since we want the HTML to render
+  processedHtml = processedHtml.replace('{achievement}', paragraphs);
+  return processedHtml; // Return early to skip normal escaping
+}
   
   return processedHtml;
 }
@@ -608,6 +617,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
