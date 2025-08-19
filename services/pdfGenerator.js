@@ -37,6 +37,18 @@ async function loadCSS(griffithsBase64, lilyWangBase64) {
 
 // Convert Shopify template name to GitHub filename
 function getTemplateFilename(templateName, letterYear, letterType) {
+  // Individual Letter (Backdated) should use the template field even if it exists
+  // For backdated individual letters, the template IS required
+  if (letterType === 'Individual Letter (Backdated)') {
+    // Individual backdated MUST have a template selected
+    if (!templateName) {
+      console.error('❌ Individual Letter (Backdated) requires a template but none provided');
+      // Default to a safe fallback or throw error
+      throw new Error('Individual Letter (Backdated) requires a template selection');
+    }
+    // Use the template map below to get the right file
+  }
+  
   // Handle letter types that don't use template field
   if (!templateName || templateName === '') {
     if (letterType === 'Write Your Own Letter') {
@@ -115,6 +127,7 @@ function processTemplateContent(templateHtml, orderData) {
   if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
     // First, check what we're receiving
     console.log('🔍 Raw achievement:', orderData.achievement);
+    console.log('🔍 Raw achievement character codes:', orderData.achievement.split('').slice(0, 100).map(c => c.charCodeAt(0)));
     
     let content = orderData.achievement;
     
@@ -125,46 +138,59 @@ function processTemplateContent(templateHtml, orderData) {
       .replace(/\r\n/g, '\n') // Convert Windows line breaks
       .replace(/\r/g, '\n');  // Convert old Mac line breaks
     
-    // Now split into paragraphs
+    console.log('📝 Content after normalization:', content);
+    console.log('📝 Looking for double newlines:', content.includes('\n\n'));
+    
     let paragraphs;
     
     // Check if we have <br> tags
     if (content.includes('<br>')) {
-      // Split on double <br> tags for paragraphs
-      paragraphs = content
-        .split(/<br>\s*<br>/)
-        .filter(p => p.trim())
-        .map(p => {
-          const cleaned = p.trim().replace(/^<br>|<br>$/g, '');
-          return `<p>${cleaned}</p>`;
-        })
-        .join('\n');
+      console.log('📝 Found <br> tags, processing as HTML');
+      // Look for double <br> as paragraph separators
+      if (content.includes('<br><br>') || content.includes('<br> <br>')) {
+        // Split on double <br> tags for paragraphs
+        paragraphs = content
+          .split(/<br>\s*<br>/)
+          .filter(p => p.trim())
+          .map(p => {
+            // Keep single <br> tags within paragraphs
+            const cleaned = p.trim();
+            return `<p>${cleaned}</p>`;
+          })
+          .join('\n');
+      } else {
+        // No double <br>, so treat the whole thing as one paragraph with line breaks
+        paragraphs = `<p>${content.trim()}</p>`;
+      }
     } 
     // Otherwise use newlines
     else {
-      // Split on double newlines for paragraphs
-      paragraphs = content
-        .split(/\n\s*\n/)  // Split on double newlines with any whitespace
-        .filter(p => p.trim())  // Remove empty paragraphs
-        .map(p => {
-          // Keep single newlines as <br> within paragraphs
-          const cleaned = p.trim().replace(/\n/g, '<br>');
-          return `<p>${cleaned}</p>`;
-        })
-        .join('\n');
+      console.log('📝 Processing newline-separated content');
       
-      // If no double newlines found, treat single newlines as paragraph breaks
-      if (paragraphs === `<p>${content.trim().replace(/\n/g, '<br>')}</p>`) {
+      // Check if we have double newlines (paragraph breaks)
+      if (content.includes('\n\n')) {
+        console.log('📝 Found double newlines, treating as paragraph breaks');
+        // Split on double newlines for paragraphs
         paragraphs = content
-          .split(/\n/)
+          .split(/\n\s*\n/)  // Split on double newlines
           .filter(p => p.trim())
-          .map(p => `<p>${p.trim()}</p>`)
+          .map(p => {
+            // Keep single newlines as <br> within paragraphs
+            const cleaned = p.trim().replace(/\n/g, '<br>');
+            return `<p>${cleaned}</p>`;
+          })
           .join('\n');
+      } else {
+        console.log('📝 No double newlines found, treating as single paragraph with line breaks');
+        // No double newlines, so it's all one paragraph with line breaks
+        // Replace single newlines with <br> tags
+        const lines = content.trim().replace(/\n/g, '<br>');
+        paragraphs = `<p>${lines}</p>`;
       }
     }
     
-    console.log('📝 Generated paragraphs:', paragraphs);
-    console.log('📊 Number of paragraphs created:', paragraphs.split('</p>').length - 1);
+    console.log('📝 Generated HTML:', paragraphs);
+    console.log('📊 Number of paragraphs created:', (paragraphs.match(/<p>/g) || []).length);
     
     // Replace the {achievement} placeholder with our formatted paragraphs
     processedHtml = processedHtml.replace('{achievement}', paragraphs);
