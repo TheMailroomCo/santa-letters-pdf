@@ -61,7 +61,7 @@ body {
 /* Letter content area with exact boundaries */
 .letter-content {
   position: absolute;
-  top: 65mm;  /* Adjust this independently of date */
+  top: 50mm;  /* Adjust this independently of date */
   left: 16mm;
   right: 16mm;
   height: 152mm;
@@ -143,6 +143,7 @@ body {
   /* No styling - just plain text */
 
 }
+
 
 
 
