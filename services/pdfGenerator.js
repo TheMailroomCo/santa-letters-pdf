@@ -144,59 +144,8 @@ function processTemplateContent(templateHtml, orderData) {
     console.log('📄 Final content preview:', processedHtml.substring(0, 500));
     console.log('🎨 Font inheritance check - container has font class:', orderData.font);
     
-    return processedHtml;  // Return early, skip other processing
+    return processedHtml;  // Return early, skip other processing for Write Your Own
   }
-  
-  // Process pronouns based on parentPronouns field
-  let pronouns = {
-    they: 'They',
-    their: 'their',
-    Their: 'Their'
-  };
-  
-  // If single parent, use their pronouns
-  if (orderData.parentPronouns) {
-    if (orderData.parentPronouns.includes('she')) {
-      pronouns = { they: 'She', their: 'her', Their: 'Her' };
-    } else if (orderData.parentPronouns.includes('he')) {
-      pronouns = { they: 'He', their: 'his', Their: 'His' };
-    }
-    // Keep default they/their if pronouns are they/them or not specified
-  }
-  
-  // Map of placeholders to data fields
-  const placeholderMap = {
-    '{name}': orderData.childName || orderData.letterName || '',
-    '{childName}': orderData.childName || '',
-    '{letterName}': orderData.letterName || '',
-    '{achievement}': orderData.achievement || '',
-    '{location}': orderData.location || '',
-    '{magicalAddress}': orderData.magicalAddress || '',
-    '{psMessage}': orderData.psMessage || '',
-    '{familyAchievement}': orderData.familyAchievement || '',
-    '{actOfKindness}': orderData.actOfKindness || '',
-    '{familyNames}': orderData.familyNames || '',
-    '{childrenNames}': orderData.childrenNames || '',
-    '{familyLastName}': orderData.familyLastName || '',
-    '{parentsNames}': orderData.parentsNames || '',
-    '{parentPronouns}': orderData.parentPronouns || '',
-    '{numberOfChristmases}': orderData.numberOfChristmases || '',
-    '{characteristics}': orderData.characteristics || '',
-    '{letterYear}': orderData.letterYear || '2025',
-    '{font}': orderData.font || '',  // No default - should come from Shopify (Fancy or Block)
-    '{envelopeColor}': orderData.envelopeColor || '',  // No default - should come from Shopify (Red or Green)
-    '{pronoun_They}': pronouns.they,
-    '{pronoun_their}': pronouns.their,
-    '{pronoun_Their}': pronouns.Their
-  };
-  
-  // Replace all placeholders
-  Object.entries(placeholderMap).forEach(([placeholder, value]) => {
-    // Escape special characters in the value for HTML
-    const escapedValue = escapeHtml(value);
-    const regex = new RegExp(placeholder.replace(/[{}]/g, '\\// Process template with data placeholders
-function processTemplateContent(templateHtml, orderData) {
-  let processedHtml = templateHtml;
   
   // Process pronouns based on parentPronouns field
   let pronouns = {
@@ -246,46 +195,6 @@ function processTemplateContent(templateHtml, orderData) {
     // Escape special characters in the value for HTML
     const escapedValue = escapeHtml(value);
     const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
-    processedHtml = processedHtml.replace(regex, escapedValue);
-  });
-  
-  // Handle custom content for "Write Your Own Letter"
-  if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
-    // First, check what we're receiving
-    console.log('🔍 Raw achievement:', orderData.achievement);
-    
-    // The achievement field contains <br> tags from Make.com
-    let content = orderData.achievement;
-    
-    // Look for various paragraph break patterns
-    // Could be <br><br> or <br> <br> or <br>\n<br> etc.
-    const paragraphs = content
-      .split(/<br>\s*<br>/)  // Split on <br><br> with any whitespace between
-      .filter(p => p.trim())  // Remove empty paragraphs
-      .map(p => {
-        // Each paragraph keeps single <br> for line breaks within
-        // Remove leading/trailing <br> tags from each paragraph
-        const cleaned = p.trim().replace(/^<br>|<br>$/g, '');
-        return `<p>${cleaned}</p>`;
-      })
-      .join('\n');
-    
-    console.log('📝 Generated paragraphs:', paragraphs);
-    console.log('📊 Number of paragraphs created:', paragraphs.split('</p>').length - 1);
-    
-    // Replace the {achievement} placeholder with our formatted paragraphs
-    // Use a more specific regex to ensure we're replacing the right thing
-    const achievementRegex = /\{achievement\}/g;
-    processedHtml = processedHtml.replace(achievementRegex, paragraphs);
-    
-    console.log('✅ Replaced achievement placeholder');
-    console.log('📄 Final content preview:', processedHtml.substring(0, 500));
-    
-    return processedHtml;  // Return early for Write Your Own
-  }
-  
-  return processedHtml;  // Return for all other letter types
-}'), 'g');
     processedHtml = processedHtml.replace(regex, escapedValue);
   });
   
