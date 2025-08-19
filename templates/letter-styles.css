@@ -45,7 +45,7 @@ body {
 /* Date display */
 .date-display {
   text-align: right;
-  margin-top: 15mm; /* Added to push date down */
+  margin-top: 10mm; /* Added to push date down */
   margin-bottom: 2mm; /* Date now sits just above the content box */
   font-size: 18pt;
 }
@@ -138,4 +138,5 @@ body {
 /* Remove highlighting for personalized text */
 .personalized-text {
   /* No styling - just plain text */
+
 }
