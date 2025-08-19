@@ -116,28 +116,57 @@ function processTemplateContent(templateHtml, orderData) {
     // First, check what we're receiving
     console.log('🔍 Raw achievement:', orderData.achievement);
     
-    // The achievement field contains <br> tags from Make.com
     let content = orderData.achievement;
     
-    // Look for various paragraph break patterns
-    // Could be <br><br> or <br> <br> or <br>\n<br> etc.
-    const paragraphs = content
-      .split(/<br>\s*<br>/)  // Split on <br><br> with any whitespace between
-      .filter(p => p.trim())  // Remove empty paragraphs
-      .map(p => {
-        // Each paragraph keeps single <br> for line breaks within
-        // Remove leading/trailing <br> tags from each paragraph
-        const cleaned = p.trim().replace(/^<br>|<br>$/g, '');
-        // Return clean paragraphs - the font styling will come from CSS cascade
-        return `<p>${cleaned}</p>`;
-      })
-      .join('\n');
+    // Handle different types of line breaks that might come from Make.com
+    // First, normalize all line breaks to a consistent format
+    content = content
+      .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines
+      .replace(/\r\n/g, '\n') // Convert Windows line breaks
+      .replace(/\r/g, '\n');  // Convert old Mac line breaks
+    
+    // Now split into paragraphs
+    let paragraphs;
+    
+    // Check if we have <br> tags
+    if (content.includes('<br>')) {
+      // Split on double <br> tags for paragraphs
+      paragraphs = content
+        .split(/<br>\s*<br>/)
+        .filter(p => p.trim())
+        .map(p => {
+          const cleaned = p.trim().replace(/^<br>|<br>$/g, '');
+          return `<p>${cleaned}</p>`;
+        })
+        .join('\n');
+    } 
+    // Otherwise use newlines
+    else {
+      // Split on double newlines for paragraphs
+      paragraphs = content
+        .split(/\n\s*\n/)  // Split on double newlines with any whitespace
+        .filter(p => p.trim())  // Remove empty paragraphs
+        .map(p => {
+          // Keep single newlines as <br> within paragraphs
+          const cleaned = p.trim().replace(/\n/g, '<br>');
+          return `<p>${cleaned}</p>`;
+        })
+        .join('\n');
+      
+      // If no double newlines found, treat single newlines as paragraph breaks
+      if (paragraphs === `<p>${content.trim().replace(/\n/g, '<br>')}</p>`) {
+        paragraphs = content
+          .split(/\n/)
+          .filter(p => p.trim())
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('\n');
+      }
+    }
     
     console.log('📝 Generated paragraphs:', paragraphs);
     console.log('📊 Number of paragraphs created:', paragraphs.split('</p>').length - 1);
     
     // Replace the {achievement} placeholder with our formatted paragraphs
-    // The paragraphs will inherit styles from .letter-content and .block-font/.fancy-font
     processedHtml = processedHtml.replace('{achievement}', paragraphs);
     
     console.log('✅ Replaced achievement placeholder');
