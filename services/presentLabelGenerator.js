@@ -5,14 +5,14 @@ const path = require('path');
 
 // The 8 Santa messages from your screenshot
 const SANTA_MESSAGES = [
-  "Watching your kindness was the best part of my year. This is just a little something to celebrate the magic you bring.",
-  "I've been watching your brave heart all year long. The way you look out for others makes the North Pole shine a little brighter.",
-  "Your generous spirit reminds me why I love Christmas so much. Thank you for showing the world how beautiful sharing can be.",
-  "The compassion you show to everyone around you warms my heart more than any fireplace ever could. Keep spreading that love.",
-  "I noticed how you always help others without being asked. That helpful heart of yours is the real Christmas magic.",
-  "Your curiosity and love of learning lights up the whole workshop! Never stop asking questions and dreaming big.",
-  "The way you include everyone and make new friends wherever you go is truly magical. Thank you for being such a wonderful friend.",
-  "Your honesty and the way you always try to do the right thing makes you one of the most wonderful people I know. Stay true to that beautiful heart."
+  "Watching your kindness was the best part of my year.\nThis is just a little something to celebrate the magic you bring.",
+  "I've been watching your brave heart all year long.\nThe way you look out for others makes the North Pole shine a little brighter.",
+  "Your generous spirit reminds me why I love Christmas so much.\nThank you for showing the world how beautiful sharing can be.",
+  "The compassion you show to everyone around you warms my heart more than any fireplace ever could.\nKeep spreading that love.",
+  "I noticed how you always help others without being asked.\nThat helpful heart of yours is the real Christmas magic.",
+  "Your curiosity and love of learning lights up the whole workshop!\nNever stop asking questions and dreaming big.",
+  "The way you include everyone and make new friends wherever you go is truly magical.\nThank you for being such a wonderful friend.",
+  "Your honesty and the way you always try to do the right thing makes you one of the most wonderful people I know.\nStay true to that beautiful heart."
 ];
 
 // Convert file to base64
@@ -162,17 +162,19 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     /* Message text */
     .message {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 7.5pt;
-      line-height: 1.25;
+      font-size: 8.5pt;  /* Increased from 7.5pt to 8.5pt */
+      line-height: 1.35;  /* Slightly increased from 1.25 for better spacing with larger text */
       color: #333;
       text-align: left;
       width: 68mm;
       position: absolute;
-      top: 31mm; /* Moved down 1mm */
+      top: 31mm;
       left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
+      white-space: pre-line;  /* This preserves the line breaks from \n */
     }
+
     
     /* "With love," above Santa signature */
     .with-love {
