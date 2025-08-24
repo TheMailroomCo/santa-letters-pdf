@@ -3,7 +3,7 @@ const chromium = require('@sparticuz/chromium');
 const fs = require('fs').promises;
 const path = require('path');
 
-// The 8 Santa messages from your screenshot
+// The 8 Santa messages
 const SANTA_MESSAGES = [
   "Watching your kindness was the best part of my year. This is just a little something to celebrate the magic you bring.",
   "I've been watching your brave heart all year long. The way you look out for others makes the North Pole shine a little brighter.",
@@ -27,7 +27,7 @@ async function fileToBase64(filePath) {
 }
 
 // Generate the CSS for present labels
-async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase64) {
+async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   return `
     @font-face {
       font-family: 'Griffiths';
@@ -58,24 +58,13 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       position: relative;
     }
     
-    /* Background image - full sheet */
-    .background {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 219mm;
-      height: 251mm;
-      z-index: 1;
-    }
-    
-    /* Container for all stickers positioned over background */
+    /* Container for all stickers */
     .sheet {
       position: absolute;
       top: 0;
       left: 0;
       width: 219mm;
       height: 251mm;
-      z-index: 2;
       display: grid;
       grid-template-columns: 95mm 95mm;
       grid-template-rows: repeat(4, 60mm);
@@ -85,7 +74,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       padding-right: 12.637mm;
       column-gap: 2.524mm;
       row-gap: 2.732mm;
-      overflow: hidden; /* Prevent any overflow */
+      overflow: hidden;
     }
     
     .sticker {
@@ -95,8 +84,8 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       width: 95mm;
       height: 60mm;
       padding: 10mm 13mm 10mm 14.377mm;
-      overflow: hidden; /* Prevent text overflow */
-      page-break-inside: avoid; /* Prevent page breaks inside stickers */
+      overflow: hidden;
+      page-break-inside: avoid;
     }
     
     .sticker-content {
@@ -106,22 +95,22 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       flex-direction: column;
     }
     
-    /* "My dearest" text */
+    /* "My dearest" text - moved down by 2mm */
     .greeting {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 10pt;
       color: #333;
       position: absolute;
-      top: 21mm; /* Moved down 1mm more */
+      top: 23mm;  /* Moved down 2mm from 21mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
     }
     
-    /* Container for name with line - positioned absolutely */
+    /* Container for name with line - moved down by 2mm */
     .name-container {
       position: absolute;
-      top: 18mm; /* Keep at 18mm for line position */
+      top: 20mm;  /* Moved down 2mm from 18mm */
       left: 14.377mm;
       width: 68mm;
       height: 10mm;
@@ -131,7 +120,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     .name-line {
       position: absolute;
       bottom: 4mm;
-      left: 18.232mm; /* 32.609mm from edge minus the 14.377mm padding */
+      left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
       background-color: #666;
@@ -143,45 +132,44 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 14mm;
       color: #333;
       position: absolute;
-      bottom: 0; /* Sits directly on the line */
-      left: 18.232mm; /* Aligned with line start */
-      width: 50mm; /* Exact width for name box */
+      bottom: 0;
+      left: 18.232mm;
+      width: 50mm;
       text-align: center;
       line-height: 1;
     }
     
     /* Dynamic sizing for longer names */
     .child-name.long-name {
-      font-size: 11mm; /* For 11-15 characters */
+      font-size: 11mm;
     }
     
     .child-name.very-long-name {
-      font-size: 9mm; /* For 16-20 characters */
+      font-size: 9mm;
     }
     
-        /* Message text */
+    /* Message text - moved down by 2mm and increased size */
     .message {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 8.5pt;  /* Increased from 7.5pt to 8.5pt */
-      line-height: 1.3;  /* Slightly increased from 1.25 for better spacing with larger text */
+      font-size: 8.5pt;  /* Increased from 7.5pt */
+      line-height: 1.3;  /* Increased from 1.25 */
       color: #333;
       text-align: left;
       width: 68mm;
       position: absolute;
-      top: 31mm;
+      top: 33mm;  /* Moved down 2mm from 31mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
     }
-
     
-    /* "With love," above Santa signature */
+    /* "With love," above Santa signature - moved down by 2mm */
     .with-love {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
       color: #333;
       position: absolute;
-      bottom: 9mm; /* Moved up 1mm */
+      bottom: 7mm;  /* Moved down 2mm from 9mm */
       left: 14.377mm;
       -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
@@ -189,14 +177,14 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
     
     /* Spacing for the pre-printed Santa Claus signature */
     .signature-space {
-      height: 0; /* No extra space needed since padding handles it */
+      height: 0;
     }
   `;
 }
 
 // Generate HTML for present labels
-async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, backgroundBase64) {
-  const css = await generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase64);
+async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64) {
+  const css = await generateLabelCSS(griffithsBase64, lilyWangBase64);
   
   // Create 8 stickers with the messages and personalized name
   const stickersHTML = SANTA_MESSAGES.map((message, index) => {
@@ -232,7 +220,6 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64, ba
       <style>${css}</style>
     </head>
     <body>
-      ${backgroundBase64 ? `<img src="data:image/png;base64,${backgroundBase64}" class="background" />` : ''}
       <div class="sheet">
         ${stickersHTML}
       </div>
@@ -256,10 +243,9 @@ async function generatePresentLabels(orderData) {
   });
   
   try {
-    // Load fonts and background as base64
+    // Load fonts as base64
     const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
-    const backgroundBase64 = await fileToBase64(path.join(__dirname, '../PresentLabels.png'));
     
     // Create page
     const page = await browser.newPage();
@@ -270,12 +256,11 @@ async function generatePresentLabels(orderData) {
       height: 948  // 251mm at 96 DPI
     });
     
-    // Generate HTML with personalized name and background
+    // Generate HTML with personalized name
     const html = await generateLabelsHTML(
       orderData.childName || 'Your Little One',
       griffithsBase64,
-      lilyWangBase64,
-      backgroundBase64
+      lilyWangBase64
     );
     
     // Set content and wait for rendering
