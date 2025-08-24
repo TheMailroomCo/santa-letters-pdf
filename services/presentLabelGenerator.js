@@ -159,11 +159,11 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       font-size: 9mm; /* For 16-20 characters */
     }
     
-    /* Message text */
+        /* Message text */
     .message {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 8.5pt;  /* Increased from 7.5pt to 8.5pt */
-      line-height: 1.35;  /* Slightly increased from 1.25 for better spacing with larger text */
+      line-height: 1.3;  /* Slightly increased from 1.25 for better spacing with larger text */
       color: #333;
       text-align: left;
       width: 68mm;
@@ -172,7 +172,6 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64, backgroundBase6
       left: 14.377mm;
       -webkit-text-stroke: 0.03pt #000000;
       text-stroke: 0.03pt #000000;
-      white-space: pre-line;  /* This preserves the line breaks from \n */
     }
 
     
