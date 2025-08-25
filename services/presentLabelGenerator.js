@@ -169,7 +169,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       font-size: 11pt;
       color: #000000;
       position: absolute;
-      bottom: 7mm;  /* Moved down 2mm from 9mm */
+      bottom: 9mm;  /* Moved down 2mm from 9mm */
       left: 14.377mm;
             -webkit-text-stroke: 0.05pt #000000;
       text-stroke: 0.05pt #000000;
