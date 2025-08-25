@@ -96,84 +96,82 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     }
     
     /* "My dearest" text - moved down by 2mm */
-    .greeting {
-      font-family: 'Griffiths', Georgia, serif;
-      font-size: 11pt;
-      color: #000000;
-      position: absolute;
-      top: 23mm;  /* Moved down 2mm from 21mm */
-      left: 14.377mm;
-      -webkit-text-stroke: 0.07pt #000000;
-      text-stroke: 0.07pt #000000;
-    }
-    
-    /* Container for name with line - moved down by 2mm */
-    .name-container {
-      position: absolute;
-      top: 20mm;  /* Moved down 2mm from 18mm */
-      left: 14.377mm;
-      width: 68mm;
-      height: 10mm;
-    }
-    
-    /* The line under the name */
-    .name-line {
-      position: absolute;
-      bottom: 4mm;
-      left: 18.232mm;
-      width: 50mm;
-      height: 0.5pt;
-      background-color: #000000;
-    }
-    
-    /* Child's name - sits ON the line */
-    .child-name {
-      font-family: 'LilyWang', cursive;
-      font-size: 14mm;
-      color: #000000;
-      position: absolute;
-      bottom: 0;
-      left: 18.232mm;
-      width: 50mm;
-      text-align: center;
-      line-height: 1;
-    }
-    
-    /* Dynamic sizing for longer names */
-    .child-name.long-name {
-      font-size: 11mm;
-    }
-    
-    .child-name.very-long-name {
-      font-size: 9mm;
-    }
-    
-    /* Message text - moved down by 2mm and increased size */
-    .message {
-      font-family: 'Griffiths', Georgia, serif;
-      font-size: 10pt;  /* Increased from 7.5pt */
-      line-height: 1.20;  /* Increased from 1.25 */
-      color: #000000;
-      text-align: left;
-      width: 68mm;
-      position: absolute;
-      top: 33mm;  /* Moved down 2mm from 31mm */
-      left: 14.377mm;
-            -webkit-text-stroke: 0.07pt #000000;
-      text-stroke: 0.07pt #000000;
-    }
-    
-    /* "With love," above Santa signature - moved down by 2mm */
-    .with-love {
-      font-family: 'Griffiths', Georgia, serif;
-      font-size: 11pt;
-      color: #000000;
-      position: absolute;
-      bottom: 9mm;  /* Moved down 2mm from 9mm */
-      left: 14.377mm;
-            -webkit-text-stroke: 0.07pt #000000;
-      text-stroke: 0.07pt #000000;
-    }
+.greeting {
+  font-family: 'Griffiths', Georgia, serif;
+  font-size: 11pt;
+  color: #000000;
+  position: absolute;
+  top: 23mm;  /* Moved down 2mm from 21mm */
+  left: 14.377mm;
+  text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000;
+}
+
+/* Container for name with line - moved down by 2mm */
+.name-container {
+  position: absolute;
+  top: 20mm;  /* Moved down 2mm from 18mm */
+  left: 14.377mm;
+  width: 68mm;
+  height: 10mm;
+}
+
+/* The line under the name */
+.name-line {
+  position: absolute;
+  bottom: 4mm;
+  left: 18.232mm;
+  width: 50mm;
+  height: 0.5pt;
+  background-color: #000000;
+}
+
+/* Child's name - sits ON the line */
+.child-name {
+  font-family: 'LilyWang', cursive;
+  font-size: 14mm;
+  color: #000000;
+  position: absolute;
+  bottom: 0;
+  left: 18.232mm;
+  width: 50mm;
+  text-align: center;
+  line-height: 1;
+}
+
+/* Dynamic sizing for longer names */
+.child-name.long-name {
+  font-size: 11mm;
+}
+
+.child-name.very-long-name {
+  font-size: 9mm;
+}
+
+/* Message text - moved down by 2mm and increased size */
+.message {
+  font-family: 'Griffiths', Georgia, serif;
+  font-size: 10pt;
+  line-height: 1.20;
+  color: #000000;
+  text-align: left;
+  width: 68mm;
+  position: absolute;
+  top: 50%;  /* Position at middle of container */
+  left: 14.377mm;
+  transform: translateY(-50%);  /* Shift up by half the text height */
+  text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000;
+}
+
+/* "With love," above Santa signature - moved down by 2mm */
+.with-love {
+  font-family: 'Griffiths', Georgia, serif;
+  font-size: 11pt;
+  color: #000000;
+  position: absolute;
+  bottom: 9mm;  /* Moved down 2mm from 9mm */
+  left: 14.377mm;
+  text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000;
+}
 
    
     /* Spacing for the pre-printed Santa Claus signature */
