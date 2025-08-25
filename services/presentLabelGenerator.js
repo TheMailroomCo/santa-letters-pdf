@@ -151,8 +151,8 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     /* Message text - moved down by 2mm and increased size */
     .message {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 11pt;  /* Increased from 7.5pt */
-      line-height: 1.35;  /* Increased from 1.25 */
+      font-size: 10pt;  /* Increased from 7.5pt */
+      line-height: 1.20;  /* Increased from 1.25 */
       color: #000000;
       text-align: left;
       width: 68mm;
