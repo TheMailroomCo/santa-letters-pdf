@@ -144,7 +144,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   position: absolute;
   top: 23mm;  /* Moved down 2mm from 21mm */
   left: 14.377mm;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* Message text - moved down by 2mm and increased size */
@@ -156,9 +156,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   text-align: left;
   width: 68mm;
   position: absolute;
-  top: 33mm;  /* Moved down 2mm from 31mm */
+  top: 32mm;  /* Moved down 2mm from 31mm */
   left: 14.377mm;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* "With love," above Santa signature - moved down by 2mm */
@@ -169,7 +169,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   position: absolute;
   bottom: 9mm;  /* Moved down 2mm from 9mm */
   left: 14.377mm;
-  font-weight: 800;
+  font-weight: 700;
 }
 
    
