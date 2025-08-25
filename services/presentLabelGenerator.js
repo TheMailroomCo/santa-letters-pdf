@@ -103,6 +103,8 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       position: absolute;
       top: 23mm;  /* Moved down 2mm from 21mm */
       left: 14.377mm;
+      -webkit-text-stroke: 0.03pt #000000;
+      text-stroke: 0.03pt #000000;
     }
     
     /* Container for name with line - moved down by 2mm */
