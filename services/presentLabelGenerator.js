@@ -157,6 +157,8 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       position: absolute;
       top: 33mm;  /* Moved down 2mm from 31mm */
       left: 14.377mm;
+            -webkit-text-stroke: 0.03pt #000000;
+      text-stroke: 0.03pt #000000;
     }
     
     /* "With love," above Santa signature - moved down by 2mm */
@@ -167,34 +169,11 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       position: absolute;
       bottom: 7mm;  /* Moved down 2mm from 9mm */
       left: 14.377mm;
+            -webkit-text-stroke: 0.05pt #000000;
+      text-stroke: 0.05pt #000000;
     }
 
-    @media print {
-  html, body, .sheet, .sticker, .sticker-content {
-    background: #ffffff !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Force text to pure black (and prevent transparency) */
-  .greeting, .message, .with-love, .child-name {
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-    opacity: 1 !important;
-    text-shadow: none !important;
-    filter: none !important;
-    mix-blend-mode: normal !important;
-  }
-
-  /* Hairlines can look grey from antialiasing – make it a touch thicker */
-  .name-line {
-    background: #000000 !important;
-    opacity: 1 !important;
-    height: 1pt !important;     /* was 0.5pt – bump to 1pt for a solid plate */
-  }
-}
-
-    
+   
     /* Spacing for the pre-printed Santa Claus signature */
     .signature-space {
       height: 0;
