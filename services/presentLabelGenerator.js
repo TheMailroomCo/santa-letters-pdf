@@ -95,7 +95,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       flex-direction: column;
     }
     
-    /* "My dearest" text - moved down by 2mm */
+   /* "My dearest" text - moved down by 2mm */
 .greeting {
   font-family: 'Griffiths', Georgia, serif;
   font-size: 11pt;
@@ -103,7 +103,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   position: absolute;
   top: 23mm;  /* Moved down 2mm from 21mm */
   left: 14.377mm;
-  -webkit-text-stroke: 0.07pt #000000;
+  font-weight: 500;
 }
 
 /* Container for name with line - moved down by 2mm */
@@ -158,7 +158,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   position: absolute;
   top: 33mm;  /* Moved down 2mm from 31mm */
   left: 14.377mm;
-  -webkit-text-stroke: 0.07pt #000000;
+  font-weight: 500;
 }
 
 /* "With love," above Santa signature - moved down by 2mm */
@@ -169,7 +169,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   position: absolute;
   bottom: 9mm;  /* Moved down 2mm from 9mm */
   left: 14.377mm;
-  -webkit-text-stroke: 0.07pt #000000;
+  font-weight: 500;
 }
 
    
