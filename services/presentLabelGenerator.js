@@ -99,12 +99,10 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     .greeting {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 10pt;
-      color: #333;
+      color: #000000;
       position: absolute;
       top: 23mm;  /* Moved down 2mm from 21mm */
       left: 14.377mm;
-      -webkit-text-stroke: 0.05pt #000000;
-      text-stroke: 0.05pt #000000;
     }
     
     /* Container for name with line - moved down by 2mm */
@@ -123,14 +121,14 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
-      background-color: #666;
+      background-color: #000000;
     }
     
     /* Child's name - sits ON the line */
     .child-name {
       font-family: 'LilyWang', cursive;
       font-size: 14mm;
-      color: #333;
+      color: #000000;
       position: absolute;
       bottom: 0;
       left: 18.232mm;
@@ -153,26 +151,22 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 8.5pt;  /* Increased from 7.5pt */
       line-height: 1.3;  /* Increased from 1.25 */
-      color: #333;
+      color: #000000;
       text-align: left;
       width: 68mm;
       position: absolute;
       top: 33mm;  /* Moved down 2mm from 31mm */
       left: 14.377mm;
-      -webkit-text-stroke: 0.03pt #000000;
-      text-stroke: 0.03pt #000000;
     }
     
     /* "With love," above Santa signature - moved down by 2mm */
     .with-love {
       font-family: 'Griffiths', Georgia, serif;
       font-size: 9pt;
-      color: #333;
+      color: #000000;
       position: absolute;
       bottom: 7mm;  /* Moved down 2mm from 9mm */
       left: 14.377mm;
-      -webkit-text-stroke: 0.05pt #000000;
-      text-stroke: 0.05pt #000000;
     }
     
     /* Spacing for the pre-printed Santa Claus signature */
