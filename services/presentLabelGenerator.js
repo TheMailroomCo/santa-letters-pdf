@@ -98,7 +98,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     /* Container for name with line */
     .name-container {
       position: absolute;
-      top: 20mm;
+      top: 14mm;  /* Moved up to align with greeting */
       left: 14.377mm;
       width: 68mm;
       height: 12mm;
@@ -107,7 +107,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     /* The line under the name */
     .name-line {
       position: absolute;
-      bottom: 2mm;  /* Fixed position for the line */
+      top: 9mm;  /* Positioned to align with "My dearest" baseline */
       left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
@@ -120,7 +120,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       font-size: 13mm;
       color: #000000;
       position: absolute;
-      bottom: 0;  /* Sits right on the line */
+      top: -2mm;  /* Positioned so bottom of text sits on line */
       left: 18.232mm;
       width: 50mm;
       text-align: center;
