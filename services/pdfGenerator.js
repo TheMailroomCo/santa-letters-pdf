@@ -676,6 +676,26 @@ async function generatePDF(orderData) {
     await fs.writeFile(letterFilepath, letterPdfBuffer);
     console.log('✅ Letter PDF saved to:', letterFilepath);
     console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
+    // Generate plain text version for editing
+let plainText = letterContent
+  .replace(/<p>/g, '\n')           
+  .replace(/<\/p>/g, '\n')         
+  .replace(/<br>/g, '\n')          
+  .replace(/<strong>/g, '')        
+  .replace(/<\/strong>/g, '')
+  .replace(/<[^>]*>/g, '')         
+  .replace(/\n\n\n+/g, '\n\n')    
+  .trim();
+
+if (orderData.psMessage) {
+  plainText += `\n\nP.S. ${orderData.psMessage}`;
+}
+
+// Save text file alongside PDF
+const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
+const textFilepath = path.join(__dirname, '../output', textFilename);
+await fs.writeFile(textFilepath, plainText, 'utf8');
+console.log('📝 Text file saved:', textFilename);
     await letterPage.close();
 
     // Generate plain text version for editing
@@ -748,5 +768,6 @@ console.log('📝 Text file saved:', textFilename);
 }
 
 module.exports = { generatePDF };
+
 
 
