@@ -101,43 +101,52 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       top: 20mm;
       left: 14.377mm;
       width: 68mm;
-      height: 10mm;
+      height: 12mm;
     }
     
-    /* Child's name - positioned from TOP for consistency */
-    .child-name {
-      font-family: 'LilyWang', cursive;
-      font-size: 14mm;
-      color: #000000;
-      position: absolute;
-      top: 0;  /* Changed from bottom: 0 - now positioned from top */
-      left: 18.232mm;
-      width: 50mm;
-      text-align: center;
-      line-height: 1;
-    }
-    
-    /* The line under the name - fixed position */
+    /* The line under the name */
     .name-line {
       position: absolute;
-      top: 11mm;  /* Fixed position from top */
+      bottom: 2mm;  /* Fixed position for the line */
       left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
       background-color: #000000;
     }
     
-    /* Dynamic sizing for longer names */
-    .child-name.long-name {
+    /* Child's name - sits directly ON the line */
+    .child-name {
+      font-family: 'LilyWang', cursive;
+      font-size: 13mm;
+      color: #000000;
+      position: absolute;
+      bottom: 0;  /* Sits right on the line */
+      left: 18.232mm;
+      width: 50mm;
+      text-align: center;
+      line-height: 1;
+      white-space: nowrap;  /* Force single line */
+    }
+    
+    /* Dynamic sizing for longer names - aggressive scaling */
+    .child-name.medium-name {
       font-size: 11mm;
     }
     
-    .child-name.very-long-name {
+    .child-name.long-name {
       font-size: 9mm;
     }
     
-    .child-name.extra-long-name {
+    .child-name.very-long-name {
       font-size: 7.5mm;
+    }
+    
+    .child-name.extra-long-name {
+      font-size: 6mm;
+    }
+    
+    .child-name.super-long-name {
+      font-size: 5mm;
     }
     
     /* "My dearest" text */
@@ -189,16 +198,20 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64) {
   
   // Create 8 stickers with the messages and personalized name
   const stickersHTML = SANTA_MESSAGES.map((message, index) => {
-    // Determine name length for dynamic sizing
+    // Determine name length for dynamic sizing - more aggressive scaling
     let nameClass = '';
-    if (childName.length >= 18) {
-      nameClass = 'extra-long-name';  // 18-20 chars
-    } else if (childName.length >= 15) {
-      nameClass = 'very-long-name';   // 15-17 chars
-    } else if (childName.length >= 12) {
-      nameClass = 'long-name';         // 12-14 chars
+    if (childName.length >= 19) {
+      nameClass = 'super-long-name';   // 19-20 chars
+    } else if (childName.length >= 16) {
+      nameClass = 'extra-long-name';   // 16-18 chars
+    } else if (childName.length >= 13) {
+      nameClass = 'very-long-name';    // 13-15 chars
+    } else if (childName.length >= 10) {
+      nameClass = 'long-name';          // 10-12 chars
+    } else if (childName.length >= 7) {
+      nameClass = 'medium-name';        // 7-9 chars
     }
-    // Default stays at 14mm for 11 chars or less
+    // Default stays at 13mm for 6 chars or less
     
     return `
     <div class="sticker">
