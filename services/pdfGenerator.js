@@ -497,8 +497,7 @@ function getEnvelopeScript() {
 }
 
 // Generate envelope HTML
-async function generateEnvelope(orderData, lilyWangBase64) {
-  const envelopeBase64 = await fileToBase64(path.join(__dirname, '../envelope.png'));
+async function generateEnvelope(orderData, lilyWangBase64) {  
   const css = await loadEnvelopeCSS(lilyWangBase64);
   
   // Format the name - preserve exactly as user entered (like builder does with pre-wrap)
@@ -535,7 +534,7 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   <style>${css}</style>
 </head>
 <body>
-  ${envelopeBase64 ? `<img src="data:image/png;base64,${envelopeBase64}" class="envelope-background" />` : ''}
+  
   
   <div class="envelope-container">
     <div class="envelope-name">
@@ -571,8 +570,7 @@ async function generatePDF(orderData) {
   });
 
   try {
-    // Load all assets as base64
-    const backgroundBase64 = await fileToBase64(path.join(__dirname, '../background.png'));
+    // Load all assets as base64  
     const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
 
@@ -611,9 +609,7 @@ async function generatePDF(orderData) {
   </style>
 </head>
 <body>
-  <!-- Background image -->
-  ${backgroundBase64 ? `<img src="data:image/png;base64,${backgroundBase64}" class="background-image" />` : ''}
-  
+  <!-- Background image -->  
   <div class="letter-container ${fontClass}">
     <div class="date-display">
       <span>${year}</span>
@@ -731,3 +727,4 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
