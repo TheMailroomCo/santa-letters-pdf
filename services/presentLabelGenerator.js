@@ -12,7 +12,7 @@ const SANTA_MESSAGES = [
   "I noticed how you always help others without being asked. That helpful heart of yours is the real Christmas magic.",
   "Your curiosity and love of learning lights up the whole workshop! Never stop asking questions and dreaming big.",
   "The way you include everyone and make new friends wherever you go is truly magical. Thank you for being such a wonderful friend.",
-  "Your honesty and the way you always try to do the right thing makes you one of the most wonderful people I know. Stay true to that beautiful heart."
+  "Your honesty and the way you always try to do the right thing makes you one of the most wonderful people I know."
 ];
 
 // Convert file to base64
@@ -111,7 +111,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
-      background-color: #000000;
+      background-color: #707070;
     }
     
     /* Child's name - sits ON the line */
@@ -185,7 +185,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       font-size: 11pt;
       color: #000000;
       position: absolute;
-      bottom: 9mm;
+      bottom: 8mm; 
       left: 14.377mm;
       font-weight: 700;
     }
