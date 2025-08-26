@@ -295,59 +295,18 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Starting font sizes in pt (converted from rem)
-      let fontSize = isFancy ? 28 : 30; // Larger for Block since spacing is tighter
-      const minSize = 10.8; // 0.9rem
-      const maxSize = 45; // Larger max for Block
+      // Set reasonable defaults and limits
+      const defaultSize = isFancy ? 16 : 17;  // Comfortable reading size
+      const minSize = 10.8;  // Emergency minimum
+      const maxSize = isFancy ? 18 : 20;  // Cap at readable size, not huge
       
-      // Binary search for best fit
-      let low = minSize;
-      let high = maxSize;
-      let bestFit = fontSize;
+      // Start at default
+      let fontSize = defaultSize;
       
-      for (let attempts = 0; attempts < 25; attempts++) {
-        const mid = (low + high) / 2;
-        
-        // Apply test size
-        container.querySelectorAll('p').forEach(p => {
-          p.style.fontSize = mid + 'pt';
-          p.style.lineHeight = isFancy ? '1.15' : '1.3';
-          // IMPORTANT: Preserve font family and text stroke for block font
-          if (isBlockFont) {
-            p.style.fontFamily = 'Griffiths, Georgia, serif';
-            p.style.webkitTextStroke = '0.142pt #000000';
-            p.style.textStroke = '0.142pt #000000';
-          } else if (isFancy) {
-            p.style.fontFamily = 'LilyWang, cursive';
-          }
-        });
-        
-        // Force reflow
-        container.offsetHeight;
-        
-        // Check if content fits
-        const containerHeight = container.clientHeight;
-        const contentHeight = container.scrollHeight;
-        
-        // We want to use as much space as possible
-        if (contentHeight <= containerHeight) {
-          // Content fits, try larger
-          bestFit = mid;
-          low = mid;
-        } else {
-          // Content overflows, try smaller
-          high = mid;
-        }
-        
-        // Stop if we're close enough (0.1pt precision)
-        if (high - low < 0.1) break;
-      }
-      
-      // Apply best fit to all paragraphs with font styles
+      // Apply default size first
       container.querySelectorAll('p').forEach(p => {
-        p.style.fontSize = bestFit + 'pt';
-        p.style.lineHeight = isFancy ? '1.15' : '1.3';
-        // IMPORTANT: Apply font family and stroke
+        p.style.fontSize = fontSize + 'pt';
+        p.style.lineHeight = isFancy ? '1.4' : '1.45';  // More breathing room
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
           p.style.webkitTextStroke = '0.142pt #000000';
@@ -357,14 +316,93 @@ function getDynamicSizingScript() {
         }
       });
       
+      // Force reflow
+      container.offsetHeight;
+      
+      // Check if content overflows at default size
+      const containerHeight = container.clientHeight;
+      let contentHeight = container.scrollHeight;
+      
+      // Only adjust size if necessary
+      if (contentHeight > containerHeight) {
+        // Content too big - shrink it
+        let low = minSize;
+        let high = fontSize;
+        
+        for (let attempts = 0; attempts < 15; attempts++) {
+          const mid = (low + high) / 2;
+          
+          container.querySelectorAll('p').forEach(p => {
+            p.style.fontSize = mid + 'pt';
+          });
+          
+          container.offsetHeight;
+          
+          if (container.scrollHeight <= containerHeight) {
+            fontSize = mid;
+            low = mid;
+          } else {
+            high = mid;
+          }
+          
+          if (high - low < 0.1) break;
+        }
+      } else if (contentHeight < containerHeight * 0.5 && fontSize < maxSize) {
+        // Content is less than half the container - can grow a bit
+        let low = fontSize;
+        let high = maxSize;
+        
+        for (let attempts = 0; attempts < 10; attempts++) {
+          const mid = (low + high) / 2;
+          
+          container.querySelectorAll('p').forEach(p => {
+            p.style.fontSize = mid + 'pt';
+          });
+          
+          container.offsetHeight;
+          
+          if (container.scrollHeight <= containerHeight) {
+            fontSize = mid;
+            low = mid;
+          } else {
+            high = mid;
+          }
+          
+          if (high - low < 0.1) break;
+        }
+      }
+      
+      // Apply final size
+      container.querySelectorAll('p').forEach(p => {
+        p.style.fontSize = fontSize + 'pt';
+        p.style.lineHeight = isFancy ? '1.4' : '1.45';
+        if (isBlockFont) {
+          p.style.fontFamily = 'Griffiths, Georgia, serif';
+          p.style.webkitTextStroke = '0.142pt #000000';
+          p.style.textStroke = '0.142pt #000000';
+        } else if (isFancy) {
+          p.style.fontFamily = 'LilyWang, cursive';
+        }
+      });
+      
+      // Add subtle top padding for very short letters
+      container.offsetHeight;
+      contentHeight = container.scrollHeight;
+      const emptySpace = containerHeight - contentHeight;
+      
+      // If more than 40% empty, add some top padding to center it a bit
+      if (emptySpace > containerHeight * 0.4) {
+        container.style.paddingTop = (emptySpace * 0.25) + 'px';
+      }
+      
       // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
       const psInner = document.querySelector('.ps-message-inner');
       if (psMessage && psInner) {
         const psText = psInner.querySelector('p');
         if (psText) {
-          // Start with SAME size as main text (inherit)
-          psText.style.fontSize = bestFit + 'pt';
+          // Start with SAME size as main text
+          psText.style.fontSize = fontSize + 'pt';
           psText.style.lineHeight = '1.05'; // Tight spacing for P.S.
           
           // Apply font styles to P.S. as well
@@ -384,17 +422,17 @@ function getDynamicSizingScript() {
             // Only scale down if it actually overflows
             if (psContentHeight > psHeight) {
               // Less aggressive reduction - start at 90%
-              psText.style.fontSize = (bestFit * 0.9) + 'pt';
+              psText.style.fontSize = (fontSize * 0.9) + 'pt';
               
               // Check again - if still too big, go to 80%
               setTimeout(() => {
                 if (psInner.scrollHeight > psHeight) {
-                  psText.style.fontSize = (bestFit * 0.8) + 'pt';
+                  psText.style.fontSize = (fontSize * 0.8) + 'pt';
                   
                   // Last resort - 70%
                   setTimeout(() => {
                     if (psInner.scrollHeight > psHeight) {
-                      psText.style.fontSize = (bestFit * 0.7) + 'pt';
+                      psText.style.fontSize = (fontSize * 0.7) + 'pt';
                     }
                   }, 10);
                 }
@@ -573,6 +611,7 @@ async function generatePDF(orderData) {
     // Load all assets as base64  
     const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
+    const backgroundBase64 = await fileToBase64(path.join(__dirname, '../background.png'));
 
     // === GENERATE LETTER ===
     const letterPage = await browser.newPage();
@@ -609,7 +648,9 @@ async function generatePDF(orderData) {
   </style>
 </head>
 <body>
-  <!-- Background image -->  
+  <!-- Background image -->
+  <img src="data:image/png;base64,${backgroundBase64}" class="background-image" alt="" />
+  
   <div class="letter-container ${fontClass}">
     <div class="date-display">
       <span>${year}</span>
