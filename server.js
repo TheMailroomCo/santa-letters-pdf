@@ -24,133 +24,153 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Test endpoint with all envelope variations
+// Replace your existing /test endpoint with this version that tests both fonts:
+
 app.get('/test', async (req, res) => {
   const testCases = [
-    // SHORT: Single child + standard address
     {
-      orderNumber: "ENV001",
+      orderNumber: "TEST-BLOCK",
       itemNumber: "1",
-      template: "Magic & Stardust",
+      template: "Snow Globe Heart",
       font: "Block",
-      childName: "Miss Charlotte Ella Smith",
-      magicalAddress: `In the house by the beach, where dreams are had
-While best friend Bella sleeps at the foot of her bed.
-Byron Bay, Nsw`,
-      letterName: "Charlotte",
-      location: "Byron Bay",
-      achievement: "helped teach her baby sister to walk",
-      psMessage: "Keep being an amazing big sister!",
+      childName: "Master Parker Jack",
+      magicalAddress: `In the Land Where Magic Never Sleeps
+Under Star-Filled Skies of Midnight Blue
+Perth, Australia`,
+      letterName: "Parker Jack",
+      location: "Windaroo",
+      achievement: "handled your big feelings with such grace",
+      psMessage: "Keep believing in magic, Parker Jack!",
       letterYear: "2025"
     },
-    
-    // MEDIUM: 2-3 kids
     {
-      orderNumber: "ENV002",
-      itemNumber: "1",
-      template: "Magic & Stardust",
+      orderNumber: "TEST-FANCY",
+      itemNumber: "1", 
+      template: "Snow Globe Heart",
       font: "Fancy",
-      childName: "Miss Alexander Smith & Miss Charlotte Thompson-Williams",
-      magicalAddress: `In the white house names Rosie.
-Where children are often heard playing
-in the magnificent green pool
-Geelong West, Victoria`,
-      letterName: "Alexander and Charlotte",
-      location: "Canberra",
-      achievement: "shared their toys without being asked",
-      letterYear: "2025"
-    },
-    
-    // MAXIMUM: Max characters test (exactly 95 characters for name)
-    {
-      orderNumber: "ENV003",
-      itemNumber: "1",
-      template: "Magic & Stardust",
-      font: "Block",
-      childName: "Master Alexander Benjamin Christopher Davidson-Montgomery III & Miss Elizabeth Victoria Rose II",
-      magicalAddress: `In the white house names Rosie.
-Where children are often heard playing
-in the magnificent green pool
-Geelong West, Victoria`,
-      letterName: "Alexander and Elizabeth",
-      location: "Darwin",
-      achievement: "showed exceptional patience and understanding",
+      childName: "Master Parker Jack",
+      magicalAddress: `In the Land Where Magic Never Sleeps
+Under Star-Filled Skies of Midnight Blue
+Perth, Australia`,
+      letterName: "Parker Jack",
+      location: "Windaroo",
+      achievement: "handled your big feelings with such grace",
+      psMessage: "Keep believing in magic, Parker Jack!",
       letterYear: "2025"
     }
   ];
 
-  // Generate all PDFs
   const results = [];
   
   for (const testCase of testCases) {
     try {
       const result = await generatePDF(testCase);
       results.push({
-        orderNumber: testCase.orderNumber,
-        childName: testCase.childName,
-        nameLength: testCase.childName.length,
         font: testCase.font,
-        addressLines: testCase.magicalAddress.split('\n').length,
         letterUrl: result.letter.url,
+        textUrl: result.letterText.url,
         envelopeUrl: result.envelope.url,
         success: true
       });
     } catch (error) {
       results.push({
-        orderNumber: testCase.orderNumber,
-        childName: testCase.childName,
-        nameLength: testCase.childName.length,
+        font: testCase.font,
         error: error.message,
         success: false
       });
     }
   }
 
-  // Build simple HTML response with clickable links
+  // Build HTML response with both test results
   let html = `
     <html>
     <head>
-      <title>Santa Letters Test Results</title>
+      <title>Font Test - Block vs Fancy</title>
       <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .test { margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; }
-        .success { background-color: #e7f5e7; }
-        .error { background-color: #f5e7e7; }
-        a { margin-right: 20px; }
-        .char-count { font-weight: bold; color: #0066cc; }
+        body { 
+          font-family: Arial, sans-serif; 
+          padding: 20px; 
+          background: #f5f5f5;
+        }
+        .container {
+          max-width: 800px;
+          margin: 0 auto;
+          background: white;
+          padding: 30px;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-row {
+          margin-bottom: 30px;
+          padding: 20px;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          background: #fafafa;
+        }
+        .test-row h3 {
+          margin-top: 0;
+          color: #333;
+        }
+        .block-font {
+          border-left: 5px solid #4CAF50;
+        }
+        .fancy-font {
+          border-left: 5px solid #2196F3;
+        }
+        a.button {
+          display: inline-block;
+          margin-right: 10px;
+          padding: 8px 16px;
+          background: #008CBA;
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          font-size: 14px;
+        }
+        a.button:hover {
+          background: #006687;
+        }
+        .letter-btn { background: #4CAF50; }
+        .letter-btn:hover { background: #45a049; }
+        .text-btn { background: #ff9800; }
+        .text-btn:hover { background: #e68900; }
+        .envelope-btn { background: #9C27B0; }
+        .envelope-btn:hover { background: #7B1FA2; }
+        .error {
+          color: red;
+          font-weight: bold;
+        }
       </style>
     </head>
     <body>
-      <h1>🎅 Santa Letters Test Results</h1>
-      <p><a href="/">Back to Home</a></p>
-      <hr>
+      <div class="container">
+        <h1>🎅 Font Test: Block vs Fancy</h1>
+        <p style="color: #666;">Testing the same letter content with both font styles</p>
+        <hr style="margin: 20px 0;">
   `;
 
-  results.forEach((result, index) => {
-    const testType = index === 0 ? "SHORT" : index === 1 ? "MEDIUM" : "MAXIMUM";
-    const isMaxTest = index === 2;
-    const charCountStyle = isMaxTest && result.nameLength === 95 ? 'color: green;' : isMaxTest ? 'color: red;' : '';
-    
+  results.forEach(result => {
+    const fontClass = result.font === 'Block' ? 'block-font' : 'fancy-font';
     html += `
-      <div class="test ${result.success ? 'success' : 'error'}">
-        <h3>Test ${index + 1} (${testType}): ${result.orderNumber}</h3>
-        <p><strong>Child Name:</strong> ${result.childName}</p>
-        <p><strong>Name Length:</strong> <span class="char-count" style="${charCountStyle}">${result.nameLength} characters</span> ${isMaxTest ? '(Target: 95)' : ''}</p>
-        <p><strong>Font:</strong> ${result.font}</p>
-        <p><strong>Address Lines:</strong> ${result.addressLines}</p>
+      <div class="test-row ${fontClass}">
+        <h3>${result.font} Font</h3>
         ${result.success ? `
           <p>
-            <a href="${result.letterUrl}" target="_blank">📄 View Letter PDF</a>
-            <a href="${result.envelopeUrl}" target="_blank">✉️ View Envelope PDF</a>
+            <a href="${result.letterUrl}" target="_blank" class="button letter-btn">📄 Letter PDF</a>
+            <a href="${result.textUrl}" target="_blank" class="button text-btn">📝 Text File</a>
+            <a href="${result.envelopeUrl}" target="_blank" class="button envelope-btn">✉️ Envelope</a>
           </p>
         ` : `
-          <p style="color: red;"><strong>Error:</strong> ${result.error}</p>
+          <p class="error">Error: ${result.error}</p>
         `}
       </div>
     `;
   });
 
   html += `
+        <hr style="margin: 30px 0 20px 0;">
+        <p><a href="/" class="button" style="background: #555;">← Back to Home</a></p>
+      </div>
     </body>
     </html>
   `;
@@ -238,4 +258,5 @@ app.get('/test-labels', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
 
