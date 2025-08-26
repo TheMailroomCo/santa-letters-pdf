@@ -95,87 +95,87 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       flex-direction: column;
     }
     
-/* Container for name with line - moved down by 2mm */
-.name-container {
-  position: absolute;
-  top: 20mm;  /* Moved down 2mm from 18mm */
-  left: 14.377mm;
-  width: 68mm;
-  height: 10mm;
-}
-
-/* The line under the name */
-.name-line {
-  position: absolute;
-  bottom: 4mm;
-  left: 18.232mm;
-  width: 50mm;
-  height: 0.5pt;
-  background-color: #000000;
-}
-
-/* Child's name - sits ON the line */
-.child-name {
-  font-family: 'LilyWang', cursive;
-  font-size: 14mm;
-  color: #000000;
-  position: absolute;
-  bottom: 0;
-  left: 18.232mm;
-  width: 50mm;
-  text-align: center;
-  line-height: 1;
-}
-
-/* Dynamic sizing for longer names */
-.child-name.long-name {
-  font-size: 11mm;
-}
-
-.child-name.very-long-name {
-  font-size: 9mm;
-}
-
-/* "My dearest" text - moved down by 2mm */
-.greeting {
-  font-family: 'Griffiths', Georgia, serif;
-  font-size: 11pt;
-  color: #000000;
-  position: absolute;
-  top: 23mm;  /* Moved down 2mm from 21mm */
-  left: 14.377mm;
-  font-weight: 700;
-}
-
-/* Message text - moved down by 2mm and increased size */
-.message {
-  font-family: 'Griffiths', Georgia, serif;
-  font-size: 10pt;  /* Increased from 7.5pt */
-  line-height: 1.20;  /* Increased from 1.25 */
-  color: #000000;
-  text-align: left;
-  width: 68mm;
-  position: absolute;
-  top: 32mm;  /* Moved down 2mm from 31mm */
-  left: 14.377mm;
-  font-weight: 700;
-}
-
-/* "With love," above Santa signature - moved down by 2mm */
-.with-love {
-  font-family: 'Griffiths', Georgia, serif;
-  font-size: 11pt;
-  color: #000000;
-  position: absolute;
-  bottom: 9mm;  /* Moved down 2mm from 9mm */
-  left: 14.377mm;
-  font-weight: 700;
-}
-.child-name.extra-long-name {
-  font-size: 7.5mm;  /* Smallest size for 19-20 character names */
-}
-
-   
+    /* Container for name with line */
+    .name-container {
+      position: absolute;
+      top: 20mm;
+      left: 14.377mm;
+      width: 68mm;
+      height: 10mm;
+    }
+    
+    /* Child's name - positioned from TOP for consistency */
+    .child-name {
+      font-family: 'LilyWang', cursive;
+      font-size: 14mm;
+      color: #000000;
+      position: absolute;
+      top: 0;  /* Changed from bottom: 0 - now positioned from top */
+      left: 18.232mm;
+      width: 50mm;
+      text-align: center;
+      line-height: 1;
+    }
+    
+    /* The line under the name - fixed position */
+    .name-line {
+      position: absolute;
+      top: 11mm;  /* Fixed position from top */
+      left: 18.232mm;
+      width: 50mm;
+      height: 0.5pt;
+      background-color: #000000;
+    }
+    
+    /* Dynamic sizing for longer names */
+    .child-name.long-name {
+      font-size: 11mm;
+    }
+    
+    .child-name.very-long-name {
+      font-size: 9mm;
+    }
+    
+    .child-name.extra-long-name {
+      font-size: 7.5mm;
+    }
+    
+    /* "My dearest" text */
+    .greeting {
+      font-family: 'Griffiths', Georgia, serif;
+      font-size: 11pt;
+      color: #000000;
+      position: absolute;
+      top: 23mm;
+      left: 14.377mm;
+      font-weight: 700;
+    }
+    
+    /* Message text */
+    .message {
+      font-family: 'Griffiths', Georgia, serif;
+      font-size: 10pt;
+      line-height: 1.20;
+      color: #000000;
+      text-align: left;
+      width: 68mm;
+      position: absolute;
+      top: 32mm;
+      left: 14.377mm;
+      font-weight: 700;
+    }
+    
+    /* "With love," above Santa signature */
+    .with-love {
+      font-family: 'Griffiths', Georgia, serif;
+      font-size: 11pt;
+      color: #000000;
+      position: absolute;
+      bottom: 9mm;
+      left: 14.377mm;
+      font-weight: 700;
+    }
+    
     /* Spacing for the pre-printed Santa Claus signature */
     .signature-space {
       height: 0;
@@ -190,15 +190,15 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64) {
   // Create 8 stickers with the messages and personalized name
   const stickersHTML = SANTA_MESSAGES.map((message, index) => {
     // Determine name length for dynamic sizing
-let nameClass = '';
-if (childName.length > 18) {
-  nameClass = 'extra-long-name';  // New class for 19-20 chars
-} else if (childName.length > 14) {
-  nameClass = 'very-long-name';   // 15-18 chars
-} else if (childName.length > 10) {
-  nameClass = 'long-name';         // 11-14 chars
-}
-// Default stays at 14mm for 10 chars or less
+    let nameClass = '';
+    if (childName.length >= 18) {
+      nameClass = 'extra-long-name';  // 18-20 chars
+    } else if (childName.length >= 15) {
+      nameClass = 'very-long-name';   // 15-17 chars
+    } else if (childName.length >= 12) {
+      nameClass = 'long-name';         // 12-14 chars
+    }
+    // Default stays at 14mm for 11 chars or less
     
     return `
     <div class="sticker">
@@ -235,6 +235,7 @@ if (childName.length > 18) {
 // Main function to generate present labels PDF
 async function generatePresentLabels(orderData) {
   console.log('🎁 Generating Present Labels for order:', orderData.orderNumber);
+  console.log('📝 Child Name received:', orderData.childName);  // Debug log
   
   const cleanOrderNumber = orderData.orderNumber.replace('#', '');
   
