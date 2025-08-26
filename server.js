@@ -166,16 +166,20 @@ app.post('/generate-pdf', async (req, res) => {
     const result = await generatePDF(req.body);
     
     res.json({
-      success: true,
-      letter: {
-        filename: result.letter.filename,
-        url: `${req.protocol}://${req.get('host')}${result.letter.url}`
-      },
-      envelope: {
-        filename: result.envelope.filename,
-        url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
-      }
-    });
+  success: true,
+  letter: {
+    filename: result.letter.filename,
+    url: `${req.protocol}://${req.get('host')}${result.letter.url}`
+  },
+  letterText: {
+    filename: result.letterText.filename,
+    url: `${req.protocol}://${req.get('host')}${result.letterText.url}`
+  },
+  envelope: {
+    filename: result.envelope.filename,
+    url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
+  }
+});
   } catch (error) {
     console.error('❌ Error:', error);
     res.status(500).json({
@@ -234,3 +238,4 @@ app.get('/test-labels', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
