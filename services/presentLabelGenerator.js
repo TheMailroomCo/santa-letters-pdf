@@ -131,22 +131,27 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
     /* Dynamic sizing for longer names - aggressive scaling */
     .child-name.medium-name {
       font-size: 11mm;
+      bottom: 0.5mm;  /* Slight adjustment to keep baseline on line */
     }
     
     .child-name.long-name {
       font-size: 9mm;
+      bottom: 1mm;  /* Adjust upward as font gets smaller */
     }
     
     .child-name.very-long-name {
       font-size: 7.5mm;
+      bottom: 1.5mm;  /* Further adjustment */
     }
     
     .child-name.extra-long-name {
       font-size: 6mm;
+      bottom: 2mm;  /* Keep lifting as font shrinks */
     }
     
     .child-name.super-long-name {
       font-size: 5mm;
+      bottom: 2.5mm;  /* Maximum adjustment for smallest text */
     }
     
     /* "My dearest" text */
