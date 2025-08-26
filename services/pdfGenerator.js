@@ -670,46 +670,45 @@ async function generatePDF(orderData) {
       .toLowerCase()
       .substring(0, 50);             // Limit length
     
-   // CORRECTED CODE - Starting at line 765
-// Save letter PDF
-const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
-const letterFilepath = path.join(__dirname, '../output', letterFilename);
-await fs.writeFile(letterFilepath, letterPdfBuffer);
-console.log('✅ Letter PDF saved to:', letterFilepath);
-console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
+    // Save letter PDF
+    const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
+    const letterFilepath = path.join(__dirname, '../output', letterFilename);
+    await fs.writeFile(letterFilepath, letterPdfBuffer);
+    console.log('✅ Letter PDF saved to:', letterFilepath);
+    console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
+    
+    // Generate plain text version for editing - MOVED HERE (BEFORE letterPage.close())
+    const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
+    const textFilepath = path.join(__dirname, '../output', textFilename);
 
-// Generate plain text version for editing - MOVED TO HERE (BEFORE letterPage.close())
-const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
-const textFilepath = path.join(__dirname, '../output', textFilename);
+    let plainText = letterContent
+      .replace(/<p>/g, '\n')           
+      .replace(/<\/p>/g, '\n')         
+      .replace(/<br>/g, '\n')          
+      .replace(/<strong>/g, '')        
+      .replace(/<\/strong>/g, '')
+      .replace(/<[^>]*>/g, '')         
+      .replace(/\n\n\n+/g, '\n\n')    
+      .trim();
 
-let plainText = letterContent
-  .replace(/<p>/g, '\n')           
-  .replace(/<\/p>/g, '\n')         
-  .replace(/<br>/g, '\n')          
-  .replace(/<strong>/g, '')        
-  .replace(/<\/strong>/g, '')
-  .replace(/<[^>]*>/g, '')         
-  .replace(/\n\n\n+/g, '\n\n')    
-  .trim();
+    if (orderData.psMessage) {
+      plainText += `\n\nP.S. ${orderData.psMessage}`;
+    }
 
-if (orderData.psMessage) {
-  plainText += `\n\nP.S. ${orderData.psMessage}`;
-}
-
-// Save text file alongside PDF
-await fs.writeFile(textFilepath, plainText, 'utf8');
-console.log('📝 Text file saved:', textFilename);
-
-// NOW close the letter page
-await letterPage.close();
-
-// Continue with envelope generation...
-// === GENERATE ENVELOPE ===
-const envelopePage = await browser.newPage();
+    // Save text file alongside PDF
+    await fs.writeFile(textFilepath, plainText, 'utf8');
+    console.log('📝 Text file saved:', textFilename);
+    
+    // NOW close the letter page
+    await letterPage.close();
+    
+    // === GENERATE ENVELOPE ===
+    const envelopePage = await browser.newPage();
     await envelopePage.setViewport({
       width: 718,  // 190mm at 96 DPI
       height: 491  // 130mm at 96 DPI
     });
+    
     const envelopeHtml = await generateEnvelope(orderData, lilyWangBase64);
     
     await envelopePage.setContent(envelopeHtml, { waitUntil: 'networkidle0' });
@@ -721,16 +720,18 @@ const envelopePage = await browser.newPage();
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
     
-    // Save envelope PDF (using same nameClean from above)
+    // Save envelope PDF
     const envelopeFilename = `order-${cleanOrderNumber}-${nameClean}-envelope.pdf`;
     const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
     await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
     console.log('✅ Envelope PDF saved to:', envelopeFilepath);
     console.log('📄 Envelope file size:', envelopePdfBuffer.length, 'bytes');
+    
     await envelopePage.close();
     
     console.log('✅ Both PDFs generated successfully');
     
+    // Return with all three properties including letterText
     return {
       success: true,
       letter: {
@@ -758,11 +759,3 @@ const envelopePage = await browser.newPage();
 }
 
 module.exports = { generatePDF };
-
-
-
-
-
-
-
-
