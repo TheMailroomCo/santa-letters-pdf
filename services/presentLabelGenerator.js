@@ -95,32 +95,32 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       flex-direction: column;
     }
     
-    /* Container for name with line */
+    /* Container for name with line - moved down by 2mm */
     .name-container {
       position: absolute;
-      top: 14mm;  /* Moved up to align with greeting */
+      top: 20mm;  /* Moved down 2mm from 18mm */
       left: 14.377mm;
       width: 68mm;
-      height: 12mm;
+      height: 10mm;
     }
     
     /* The line under the name */
     .name-line {
       position: absolute;
-      top: 9mm;  /* Positioned to align with "My dearest" baseline */
+      bottom: 4mm;
       left: 18.232mm;
       width: 50mm;
       height: 0.5pt;
       background-color: #000000;
     }
     
-    /* Child's name - sits directly ON the line */
+    /* Child's name - sits ON the line */
     .child-name {
       font-family: 'LilyWang', cursive;
       font-size: 13mm;
       color: #000000;
       position: absolute;
-      top: -2mm;  /* Positioned so bottom of text sits on line */
+      bottom: 0;
       left: 18.232mm;
       width: 50mm;
       text-align: center;
