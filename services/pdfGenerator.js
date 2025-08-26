@@ -731,8 +731,15 @@ async function generatePDF(orderData) {
     
     console.log('✅ Both PDFs generated successfully');
     
-    // Return with all three properties including letterText
-    return {
+    // Debug logging before return
+    console.log('🔍 DEBUG - Variables before return:');
+    console.log('  letterFilename:', letterFilename);
+    console.log('  textFilename:', textFilename);
+    console.log('  envelopeFilename:', envelopeFilename);
+    console.log('  typeof textFilename:', typeof textFilename);
+    console.log('  typeof textFilepath:', typeof textFilepath);
+    
+    const returnObject = {
       success: true,
       letter: {
         filename: letterFilename,
@@ -750,6 +757,11 @@ async function generatePDF(orderData) {
         url: `/pdfs/${envelopeFilename}`
       }
     };
+    
+    console.log('📦 DEBUG - Return object:', JSON.stringify(returnObject, null, 2));
+    
+    // Return with all three properties including letterText
+    return returnObject;
   } catch (error) {
     console.error('❌ PDF Generation Error:', error);
     throw error;
