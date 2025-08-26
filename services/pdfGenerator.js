@@ -745,12 +745,6 @@ console.log('📝 Text file saved:', textFilename);
         url: `/pdfs/${envelopeFilename}`
       }
     };
-      envelope: {
-        filename: envelopeFilename,
-        path: envelopeFilepath,
-        url: `/pdfs/${envelopeFilename}`
-      }
-    };
   } catch (error) {
     console.error('❌ PDF Generation Error:', error);
     throw error;
@@ -760,6 +754,7 @@ console.log('📝 Text file saved:', textFilename);
 }
 
 module.exports = { generatePDF };
+
 
 
 
