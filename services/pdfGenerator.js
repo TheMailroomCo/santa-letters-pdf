@@ -753,6 +753,17 @@ console.log('📝 Text file saved:', textFilename);
         path: letterFilepath,
         url: `/pdfs/${letterFilename}`
       },
+      letterText: {
+        filename: textFilename,
+        path: textFilepath,
+        url: `/pdfs/${textFilename}`
+      },
+      envelope: {
+        filename: envelopeFilename,
+        path: envelopeFilepath,
+        url: `/pdfs/${envelopeFilename}`
+      }
+    };
       envelope: {
         filename: envelopeFilename,
         path: envelopeFilepath,
@@ -768,6 +779,7 @@ console.log('📝 Text file saved:', textFilename);
 }
 
 module.exports = { generatePDF };
+
 
 
 
