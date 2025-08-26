@@ -670,13 +670,15 @@ async function generatePDF(orderData) {
       .toLowerCase()
       .substring(0, 50);             // Limit length
     
-    // Save letter PDF
-    const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
-    const letterFilepath = path.join(__dirname, '../output', letterFilename);
-    await fs.writeFile(letterFilepath, letterPdfBuffer);
-    console.log('✅ Letter PDF saved to:', letterFilepath);
-    console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
-    // Generate plain text version for editing
+   // CORRECTED CODE - Starting at line 765
+// Save letter PDF
+const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
+const letterFilepath = path.join(__dirname, '../output', letterFilename);
+await fs.writeFile(letterFilepath, letterPdfBuffer);
+console.log('✅ Letter PDF saved to:', letterFilepath);
+console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
+
+// Generate plain text version for editing - MOVED TO HERE (BEFORE letterPage.close())
 const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
 const textFilepath = path.join(__dirname, '../output', textFilename);
 
@@ -697,12 +699,13 @@ if (orderData.psMessage) {
 // Save text file alongside PDF
 await fs.writeFile(textFilepath, plainText, 'utf8');
 console.log('📝 Text file saved:', textFilename);
-    await letterPage.close();
 
-  
-    
-    // === GENERATE ENVELOPE ===
-    const envelopePage = await browser.newPage();
+// NOW close the letter page
+await letterPage.close();
+
+// Continue with envelope generation...
+// === GENERATE ENVELOPE ===
+const envelopePage = await browser.newPage();
     await envelopePage.setViewport({
       width: 718,  // 190mm at 96 DPI
       height: 491  // 130mm at 96 DPI
@@ -755,6 +758,7 @@ console.log('📝 Text file saved:', textFilename);
 }
 
 module.exports = { generatePDF };
+
 
 
 
