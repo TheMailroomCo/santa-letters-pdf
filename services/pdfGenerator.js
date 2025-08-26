@@ -610,8 +610,8 @@ async function generatePDF(orderData) {
   </style>
 </head>
 <body>
-  <!-- Background image -->
-  <img src="data:image/png;base64,${backgroundBase64}" class="background-image" alt="" />
+  <!-- Background image commented out for testing -->
+  <!-- <img src="data:image/png;base64,${backgroundBase64}" class="background-image" alt="" /> -->
   
   <div class="letter-container ${fontClass}">
     <div class="date-display">
@@ -684,22 +684,39 @@ async function generatePDF(orderData) {
     const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
     const textFilepath = path.join(__dirname, '../output', textFilename);
 
-    let plainText = letterContent
-      .replace(/<p>/g, '\n')           
-      .replace(/<\/p>/g, '\n')         
-      .replace(/<br>/g, '\n')          
-      .replace(/<strong>/g, '')        
-      .replace(/<\/strong>/g, '')
-      .replace(/<[^>]*>/g, '')         
-      .replace(/\n\n\n+/g, '\n\n')    
-      .trim();
+    // Extract ONLY text from the page, no images or backgrounds
+    const plainText = await letterPage.evaluate(() => {
+      const content = document.querySelector('.letter-content');
+      if (!content) return '';
+      
+      // Get all paragraphs and extract ONLY their text content
+      const paragraphs = content.querySelectorAll('p');
+      const textArray = [];
+      
+      paragraphs.forEach(p => {
+        // Get only the text, no HTML or images
+        const text = p.innerText || p.textContent || '';
+        const cleanText = text.trim();
+        if (cleanText && cleanText.length > 0) {
+          textArray.push(cleanText);
+        }
+      });
+      
+      return textArray.join('\n\n');
+    });
 
+    // Add P.S. message if it exists
+    let finalText = plainText;
     if (orderData.psMessage) {
-      plainText += `\n\nP.S. ${orderData.psMessage}`;
+      // Make sure psMessage is clean text only
+      const cleanPS = orderData.psMessage.replace(/<[^>]*>/g, '').trim();
+      if (cleanPS) {
+        finalText += `\n\nP.S. ${cleanPS}`;
+      }
     }
 
     // Save text file alongside PDF
-    await fs.writeFile(textFilepath, plainText, 'utf8');
+    await fs.writeFile(textFilepath, finalText, 'utf8');
     console.log('📝 Text file saved:', textFilename);
     
     // NOW close the letter page
