@@ -298,7 +298,7 @@ function getDynamicSizingScript() {
       // Set reasonable defaults and limits
       const defaultSize = isFancy ? 16 : 17;  // Comfortable reading size
       const minSize = 10.8;  // Emergency minimum
-      const maxSize = isFancy ? 18 : 20;  // Cap at readable size, not huge
+      const maxSize = isFancy ? 20 : 22;  // Cap at readable size
       
       // Start at default
       let fontSize = defaultSize;
@@ -306,13 +306,15 @@ function getDynamicSizingScript() {
       // Apply default size first
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = fontSize + 'pt';
-        p.style.lineHeight = isFancy ? '1.4' : '1.45';  // More breathing room
+        p.style.lineHeight = isFancy ? '1.15' : '1.3';  // RESTORED ORIGINAL LINE HEIGHT
+        // IMPORTANT: Preserve font family and text stroke for block font
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
           p.style.webkitTextStroke = '0.142pt #000000';
           p.style.textStroke = '0.142pt #000000';
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
+          // Note: Fancy font doesn't have stroke in original
         }
       });
       
@@ -334,6 +336,15 @@ function getDynamicSizingScript() {
           
           container.querySelectorAll('p').forEach(p => {
             p.style.fontSize = mid + 'pt';
+            p.style.lineHeight = isFancy ? '1.15' : '1.3';  // Keep original line height
+            // Reapply font styles
+            if (isBlockFont) {
+              p.style.fontFamily = 'Griffiths, Georgia, serif';
+              p.style.webkitTextStroke = '0.142pt #000000';
+              p.style.textStroke = '0.142pt #000000';
+            } else if (isFancy) {
+              p.style.fontFamily = 'LilyWang, cursive';
+            }
           });
           
           container.offsetHeight;
@@ -357,6 +368,15 @@ function getDynamicSizingScript() {
           
           container.querySelectorAll('p').forEach(p => {
             p.style.fontSize = mid + 'pt';
+            p.style.lineHeight = isFancy ? '1.15' : '1.3';  // Keep original line height
+            // Reapply font styles
+            if (isBlockFont) {
+              p.style.fontFamily = 'Griffiths, Georgia, serif';
+              p.style.webkitTextStroke = '0.142pt #000000';
+              p.style.textStroke = '0.142pt #000000';
+            } else if (isFancy) {
+              p.style.fontFamily = 'LilyWang, cursive';
+            }
           });
           
           container.offsetHeight;
@@ -375,7 +395,8 @@ function getDynamicSizingScript() {
       // Apply final size
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = fontSize + 'pt';
-        p.style.lineHeight = isFancy ? '1.4' : '1.45';
+        p.style.lineHeight = isFancy ? '1.15' : '1.3';  // RESTORED ORIGINAL
+        // IMPORTANT: Apply font family and stroke
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
           p.style.webkitTextStroke = '0.142pt #000000';
