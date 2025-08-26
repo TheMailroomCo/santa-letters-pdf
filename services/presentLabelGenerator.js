@@ -171,6 +171,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
   left: 14.377mm;
   font-weight: 700;
 }
+.child-name.extra-long-name {
+  font-size: 7.5mm;  /* Smallest size for 19-20 character names */
+}
 
    
     /* Spacing for the pre-printed Santa Claus signature */
@@ -187,12 +190,15 @@ async function generateLabelsHTML(childName, griffithsBase64, lilyWangBase64) {
   // Create 8 stickers with the messages and personalized name
   const stickersHTML = SANTA_MESSAGES.map((message, index) => {
     // Determine name length for dynamic sizing
-    let nameClass = '';
-    if (childName.length > 15) {
-      nameClass = 'very-long-name';
-    } else if (childName.length > 10) {
-      nameClass = 'long-name';
-    }
+let nameClass = '';
+if (childName.length > 18) {
+  nameClass = 'extra-long-name';  // New class for 19-20 chars
+} else if (childName.length > 14) {
+  nameClass = 'very-long-name';   // 15-18 chars
+} else if (childName.length > 10) {
+  nameClass = 'long-name';         // 11-14 chars
+}
+// Default stays at 14mm for 10 chars or less
     
     return `
     <div class="sticker">
