@@ -81,23 +81,24 @@ if (!templateName || templateName === '') {
   }
   
   // Convert template name to kebab-case filename
-  const templateMap = {
-    'The Grand Library of Kind Hearts': 'the-grand-library-of-kind-hearts.html',
-    'Snow Globe Heart': 'snow-globe-heart.html',
-    'The Brave One': 'the-brave-one.html',
-    'Royal Winter Gala': 'royal-winter-gala.html',
-    'Magic and Stardust': 'magic-and-stardust.html',
-    'Magic & Stardust': 'magic-and-stardust.html',
-    'The Watchful Elf': 'the-watchful-elf.html',
-    'The Helpful Reindeer': 'the-helpful-reindeer.html',
-    'The Night Sky': 'the-night-sky.html',
-    "Baby's First Christmas": 'babys-first-christmas.html',
-    'Non-Believer Letter': 'non-believer-letter.html',
-    'Write Your Own Letter': 'write-your-own.html',
-    'Write Your Own': 'write-your-own.html'
-    'Toddler Letter': 'toddler-letter.html'
-  'Toddler': 'toddler-letter.html'
-  };
+  // Convert template name to kebab-case filename
+const templateMap = {
+  'The Grand Library of Kind Hearts': 'the-grand-library-of-kind-hearts.html',
+  'Snow Globe Heart': 'snow-globe-heart.html',
+  'The Brave One': 'the-brave-one.html',
+  'Royal Winter Gala': 'royal-winter-gala.html',
+  'Magic and Stardust': 'magic-and-stardust.html',
+  'Magic & Stardust': 'magic-and-stardust.html',
+  'The Watchful Elf': 'the-watchful-elf.html',
+  'The Helpful Reindeer': 'the-helpful-reindeer.html',
+  'The Night Sky': 'the-night-sky.html',
+  "Baby's First Christmas": 'babys-first-christmas.html',
+  'Non-Believer Letter': 'non-believer-letter.html',
+  'Write Your Own Letter': 'write-your-own.html',
+  'Write Your Own': 'write-your-own.html',  // ← Added missing comma
+  'Toddler Letter': 'toddler-letter.html',  // ← Added missing comma
+  'Toddler': 'toddler-letter.html'          // ← This comma is optional (last entry)
+};
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
 }
@@ -797,5 +798,6 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
