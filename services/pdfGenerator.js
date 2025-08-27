@@ -50,12 +50,15 @@ function getTemplateFilename(templateName, letterYear, letterType) {
   }
   
   // Handle letter types that don't use template field
-  if (!templateName || templateName === '') {
-    if (letterType === 'Write Your Own Letter') {
-      return 'write-your-own.html';
-    }
-    // Check if letterType contains "Family Letter"
-    if (letterType && letterType.includes('Family Letter')) {
+if (!templateName || templateName === '') {
+  if (letterType === 'Write Your Own Letter') {
+    return 'write-your-own.html';
+  }
+  if (letterType === 'Toddler Letter') {
+    return 'toddler-letter.html';
+  }
+  // Check if letterType contains "Family Letter"
+  if (letterType && letterType.includes('Family Letter')) {
       // Check if it's backdated based on the letterType string
       if (letterType.includes('Backdated')) {
         return 'family-letter-backdated.html';
@@ -91,6 +94,8 @@ function getTemplateFilename(templateName, letterYear, letterType) {
     'Non-Believer Letter': 'non-believer-letter.html',
     'Write Your Own Letter': 'write-your-own.html',
     'Write Your Own': 'write-your-own.html'
+    'Toddler Letter': 'toddler-letter.html'
+  'Toddler': 'toddler-letter.html'
   };
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
@@ -791,3 +796,4 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
