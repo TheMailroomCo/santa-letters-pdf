@@ -54,7 +54,8 @@ if (!templateName || templateName === '') {
   if (letterType === 'Write Your Own Letter') {
     return 'write-your-own.html';
   }
-  if (letterType === 'Toddler Letter') {
+  if (letterType === 'Toddler Letter' || letterType === 'Toddler') {
+
     return 'toddler-letter.html';
   }
   // Check if letterType contains "Family Letter"
@@ -796,4 +797,5 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
