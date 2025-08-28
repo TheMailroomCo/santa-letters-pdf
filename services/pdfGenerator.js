@@ -95,10 +95,10 @@ const templateMap = {
   "Baby's First Christmas": 'babys-first-christmas.html',
   'Non-Believer Letter': 'non-believer-letter.html',
   'Write Your Own Letter': 'write-your-own.html',
-  'Write Your Own': 'write-your-own.html',  // ← Added missing comma
-  'Toddler Letter': 'toddler-letter.html',  // ← Added missing comma
-  'Toddler': 'toddler-letter.html'          // ← This comma is optional (last entry)
-  'Toddler Letter (Second Christmas)': 'toddler-letter.html',
+  'Write Your Own': 'write-your-own.html',
+  'Toddler Letter': 'toddler-letter.html',
+  'Toddler': 'toddler-letter.html',  // ADD COMMA HERE
+  'Toddler Letter (Second Christmas)': 'toddler-letter.html'
 };
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
@@ -799,6 +799,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
