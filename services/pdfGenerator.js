@@ -54,10 +54,10 @@ if (!templateName || templateName === '') {
   if (letterType === 'Write Your Own Letter') {
     return 'write-your-own.html';
   }
-  if (letterType === 'Toddler Letter' || letterType === 'Toddler') {
-
+  if (letterType === 'Toddler Letter' || letterType === 'Toddler' || letterType === 'Toddler Letter (Second Christmas)') {
     return 'toddler-letter.html';
-  }
+}
+
   // Check if letterType contains "Family Letter"
   if (letterType && letterType.includes('Family Letter')) {
       // Check if it's backdated based on the letterType string
@@ -98,6 +98,7 @@ const templateMap = {
   'Write Your Own': 'write-your-own.html',  // ← Added missing comma
   'Toddler Letter': 'toddler-letter.html',  // ← Added missing comma
   'Toddler': 'toddler-letter.html'          // ← This comma is optional (last entry)
+  'Toddler Letter (Second Christmas)': 'toddler-letter.html',
 };
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
@@ -798,6 +799,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
