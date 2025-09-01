@@ -379,18 +379,31 @@ async function loadEnvelopeCSS(lilyWangBase64) {
 // Script to handle dynamic centering of envelope text
 function getEnvelopeScript() {
   return `
+    // Center text vertically while keeping improved positioning logic
     setTimeout(() => {
       const nameElement = document.querySelector('.envelope-name');
       const addressElement = document.querySelector('.envelope-address');
       
       if (nameElement && addressElement) {
+        // Log the text being displayed
         const nameText = nameElement.textContent || '';
+        const nameLines = nameText.split('\\n').length;
         
-        let nameFontSize = 30;
+        console.log('📝 Name text:', nameText);
+        console.log('📏 Name lines:', nameLines);
+        console.log('📏 Name length:', nameText.length, 'characters');
+        
+        // Dynamic font sizing for very long names (name only)
+        let nameFontSize = 30; // Default from CSS
+        
+        // Count actual rendered lines after wrapping
         const originalHeight = nameElement.offsetHeight;
         const lineHeight = parseFloat(getComputedStyle(nameElement).lineHeight);
         const actualLines = Math.round(originalHeight / lineHeight);
         
+        console.log('📏 Actual rendered lines:', actualLines);
+        
+        // Reduce font size for long names or multiple lines
         if (nameText.length > 90 || actualLines >= 3) {
           nameFontSize = 26;
         } else if (nameText.length > 70 || actualLines === 2) {
@@ -398,24 +411,43 @@ function getEnvelopeScript() {
         } else if (nameText.length > 50) {
           nameFontSize = 29;
         }
+        // Under 50 characters uses 30pt (the CSS default)
         
+        // Apply the calculated font size to NAME only
         nameElement.style.fontSize = nameFontSize + 'pt';
         
+        // Keep address at CSS-defined size (19pt) - don't override
+        addressElement.style.fontSize = '19pt';
+        
+        console.log('📏 Using name font size:', nameFontSize + 'pt');
+        console.log('📏 Using address font size: 19pt (CSS default)');
+        
+        // Force reflow to get accurate measurements after font size change
         nameElement.offsetHeight;
         addressElement.offsetHeight;
         
+        // Get heights after text is rendered
         const nameHeight = nameElement.offsetHeight;
         const addressHeight = addressElement.offsetHeight;
-        const gap = 8 * (96/72);
+        const gap = 8 * (96/72); // Reduced gap from 16px to 8px for closer spacing
         
+        // Total height of text block
         const totalHeight = nameHeight + gap + addressHeight;
-        const availableSpace = 50 * 3.7795;
-        const topBoundary = 70 * 3.7795;
         
+        // Available space: from 70mm to 120mm (50mm of space)
+        const availableSpace = 50 * 3.7795; // Convert to pixels
+        const topBoundary = 70 * 3.7795; // Start 70mm from top
+        
+        // Center the text block in available space
         const topOffset = topBoundary + (availableSpace - totalHeight) / 2;
         
+        // Position name at calculated offset
         nameElement.style.top = (topOffset / 3.7795) + 'mm';
+        
+        // Position address below name with specified gap
         addressElement.style.top = ((topOffset + nameHeight + gap) / 3.7795) + 'mm';
+        
+        console.log('📐 Positioning: Name at', (topOffset / 3.7795).toFixed(1) + 'mm, Address at', ((topOffset + nameHeight + gap) / 3.7795).toFixed(1) + 'mm');
       }
     }, 100);
   `;
