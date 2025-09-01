@@ -11,8 +11,7 @@ const GITHUB_TEMPLATE_BASE = 'https://raw.githubusercontent.com/TheMailroomCo/sa
 async function fileToBase64(filePath) {
   try {
     const file = await fs.readFile(filePath);
-    // Use Buffer.from to ensure proper binary encoding
-    return Buffer.from(file).toString('base64');
+    return file.toString('base64');
   } catch (error) {
     console.error('Error reading file:', filePath, error);
     return null;
@@ -422,7 +421,6 @@ async function loadEnvelopeCSS(lilyWangBase64) {
     const cssPath = path.join(__dirname, '../templates/envelope-styles.css');
     let css = await fs.readFile(cssPath, 'utf8');
     
-    // Replace font placeholder with actual base64 data
     css = css.replace('LILYWANG_BASE64', `data:font/opentype;base64,${lilyWangBase64}`);
     
     return css;
@@ -809,6 +807,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
