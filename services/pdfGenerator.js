@@ -806,7 +806,13 @@ async function generatePDF(orderData) {
   }
 }
 
-module.exports = { generatePDF };
+module.exports = { 
+  generatePDF,
+  getTemplateFilename,
+  fetchTemplate,
+  processTemplateContent
+};
+
 
 
 
