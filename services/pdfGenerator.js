@@ -509,14 +509,15 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   const css = await loadEnvelopeCSS(lilyWangBase64);
   
   // Format the name - convert newlines to <br> for HTML
-  const envelopeName = orderData.childName || orderData.familyNames || '';
-  
-  // Convert newlines to <br> tags for proper HTML rendering
-  const formattedEnvelopeName = envelopeName
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .join('<br>');
+const envelopeName = orderData.childName || orderData.familyNames || '';
+
+// Convert LITERAL \n characters AND actual newlines to <br> tags
+const formattedEnvelopeName = envelopeName
+  .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines first
+  .split('\n')
+  .map(line => line.trim())
+  .filter(line => line.length > 0)
+  .join('<br>');
     
   console.log('📝 Name for envelope (preserving user line breaks):', envelopeName.replace(/\n/g, ' | '));
   console.log('📝 Formatted for HTML:', formattedEnvelopeName);
@@ -607,8 +608,13 @@ async function generatePDF(orderData) {
 // Check if we're using corrected text directly
 if (orderData.directLetterContent) {
   console.log('📝 Using corrected text directly');
+  console.log('📝 Raw text received:', orderData.directLetterContent);
   
   let fullText = orderData.directLetterContent;
+  
+  // Handle literal \n characters that might come from Make.com/Claude
+  fullText = fullText.replace(/\\n/g, '\n');
+  console.log('📝 After converting literal \\n:', fullText);
   
   // Extract P.S. message from the corrected text
   const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
@@ -616,24 +622,36 @@ if (orderData.directLetterContent) {
     orderData.psMessage = psMatch[1];
     // Remove P.S. from the main content
     fullText = fullText.substring(0, psMatch.index).trim();
+    console.log('📝 Extracted P.S.:', orderData.psMessage);
+    console.log('📝 Letter content without P.S.:', fullText);
   }
   
   // Convert paragraphs to HTML format
-  // Split on double line breaks to get paragraphs
-  const paragraphs = fullText
-    .split('\n\n')
-    .filter(p => p.trim()) // Remove empty paragraphs
-    .map(p => {
-      // Replace single line breaks with <br> within paragraphs
-      const formattedP = p.trim().replace(/\n/g, '<br>');
-      return `<p>${formattedP}</p>`;
-    })
-    .join('\n');
+  let paragraphs;
+  
+  // Check if we have clear paragraph breaks (double newlines)
+  if (fullText.includes('\n\n')) {
+    console.log('📝 Found double newlines - treating as paragraph breaks');
+    paragraphs = fullText
+      .split('\n\n')
+      .filter(p => p.trim()) // Remove empty paragraphs
+      .map(p => {
+        // Replace single line breaks with <br> within paragraphs
+        const formattedP = p.trim().replace(/\n/g, '<br>');
+        return `<p>${formattedP}</p>`;
+      })
+      .join('\n');
+  } else {
+    console.log('📝 No double newlines found - creating single paragraph with line breaks');
+    // If no clear paragraph breaks, make one paragraph with line breaks
+    paragraphs = `<p>${fullText.trim().replace(/\n/g, '<br>')}</p>`;
+  }
   
   // Set the letterContent directly (no template needed)
   letterContent = paragraphs;
   
-  console.log('📝 Processed paragraphs:', paragraphs);
+  console.log('📝 Final processed paragraphs:', paragraphs.substring(0, 300) + '...');
+  console.log('📝 Number of <p> tags created:', (paragraphs.match(/<p>/g) || []).length);
 } else {
   // Normal template processing
   const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
@@ -845,6 +863,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
