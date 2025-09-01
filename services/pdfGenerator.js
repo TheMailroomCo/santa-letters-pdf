@@ -195,33 +195,33 @@ function processTemplateContent(templateHtml, orderData) {
     }
   }
   
-// Map of placeholders to data fields
-const placeholderMap = {
-  '{name}': orderData.childName || orderData.letterName || '',
-  '{childName}': orderData.childName || '',
-  '{letterName}': orderData.letterName || '',
-  '{achievement}': orderData.achievement || '',
-  '{location}': orderData.location || '',
-  '{magicalAddress}': orderData.magicalAddress || '',
-  '{psMessage}': orderData.psMessage || '',
-  '{familyAchievement}': orderData.familyAchievement || '',
-  '{actOfKindness}': orderData.actOfKindness || '',
-  '{familyNames}': orderData.familyNames || '',
-  '{childrenNames}': orderData.childrenNames || '',
-  '{familyLastName}': orderData.familyLastName || '',
-  '{parentsNames}': orderData.parentsNames || '',
-  '{parentPronouns}': orderData.parentPronouns || '',
-  '{numberOfChristmases}': orderData.numberOfChristmases || '',
-  '{characteristics}': orderData.characteristics || '',
-  '{letterYear}': orderData.letterYear || '2025',
-  '{font}': orderData.font || '',
-  '{envelopeColor}': orderData.envelopeColor || '',
-  '{pronoun_They}': pronouns.they,
-  '{pronoun_their}': pronouns.their,
-  '{pronoun_Their}': pronouns.Their,
-  '{correctedLetter}': orderData.correctedLetter || '',  // <- Added comma here
-  '{yourLetter}': orderData.yourLetter || ''
-};
+  // Map of placeholders to data fields
+  const placeholderMap = {
+    '{name}': orderData.childName || orderData.letterName || '',
+    '{childName}': orderData.childName || '',
+    '{letterName}': orderData.letterName || '',
+    '{achievement}': orderData.achievement || '',
+    '{location}': orderData.location || '',
+    '{magicalAddress}': orderData.magicalAddress || '',
+    '{psMessage}': orderData.psMessage || '',
+    '{familyAchievement}': orderData.familyAchievement || '',
+    '{actOfKindness}': orderData.actOfKindness || '',
+    '{familyNames}': orderData.familyNames || '',
+    '{childrenNames}': orderData.childrenNames || '',
+    '{familyLastName}': orderData.familyLastName || '',
+    '{parentsNames}': orderData.parentsNames || '',
+    '{parentPronouns}': orderData.parentPronouns || '',
+    '{numberOfChristmases}': orderData.numberOfChristmases || '',
+    '{characteristics}': orderData.characteristics || '',
+    '{letterYear}': orderData.letterYear || '2025',
+    '{font}': orderData.font || '',
+    '{envelopeColor}': orderData.envelopeColor || '',
+    '{pronoun_They}': pronouns.they,
+    '{pronoun_their}': pronouns.their,
+    '{pronoun_Their}': pronouns.Their,
+    '{correctedLetter}': orderData.correctedLetter || '',
+    '{yourLetter}': orderData.yourLetter || ''
+  };
   
   // Replace all placeholders
   Object.entries(placeholderMap).forEach(([placeholder, value]) => {
@@ -458,6 +458,11 @@ function getEnvelopeScript() {
 async function generateEnvelope(orderData, lilyWangBase64) {  
   const css = await loadEnvelopeCSS(lilyWangBase64);
   
+  console.log('🔍 ENVELOPE CSS DEBUG:');
+  console.log('CSS contains .envelope-name font-size:', css.includes('envelope-name') && css.includes('30pt'));
+  console.log('CSS contains .envelope-address font-size:', css.includes('envelope-address') && css.includes('19pt'));
+  console.log('CSS length:', css.length);
+  
   const envelopeName = orderData.childName || orderData.familyNames || '';
 
   // Handle literal \n characters AND actual newlines
@@ -501,6 +506,10 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   <style>${css}</style>
 </head>
 <body>
+  <!-- TEST: CSS font sizes -->
+  <div style="position: absolute; top: 10mm; left: 10mm; font-size: 30pt; font-family: 'LilyWang', cursive; color: red;">TEST NAME SIZE</div>
+  <div style="position: absolute; top: 25mm; left: 10mm; font-size: 19pt; font-family: 'LilyWang', cursive; color: blue;">TEST ADDRESS SIZE</div>
+  
   <div class="envelope-container">
     <div class="envelope-name">
       ${formattedEnvelopeName}
@@ -773,4 +782,3 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
-
