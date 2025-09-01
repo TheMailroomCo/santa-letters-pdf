@@ -606,22 +606,34 @@ async function generatePDF(orderData) {
 
 // Check if we're using corrected text directly
 if (orderData.directLetterContent) {
-  console.log('📝 Using corrected letter template');
+  console.log('📝 Using corrected text directly');
+  
+  let fullText = orderData.directLetterContent;
   
   // Extract P.S. message from the corrected text
-  const psMatch = orderData.directLetterContent.match(/P\.S\.\s+(.+)$/);
+  const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
   if (psMatch) {
     orderData.psMessage = psMatch[1];
     // Remove P.S. from the main content
-    orderData.correctedLetter = orderData.directLetterContent.replace(/P\.S\.\s+.+$/, '').trim();
-  } else {
-    orderData.correctedLetter = orderData.directLetterContent;
+    fullText = fullText.substring(0, psMatch.index).trim();
   }
   
-  // Use the corrected letter template
-  const templateFilename = 'corrected-letter.html';
-  const templateHtml = await fetchTemplate(templateFilename);
-  letterContent = processTemplateContent(templateHtml, orderData);
+  // Convert paragraphs to HTML format
+  // Split on double line breaks to get paragraphs
+  const paragraphs = fullText
+    .split('\n\n')
+    .filter(p => p.trim()) // Remove empty paragraphs
+    .map(p => {
+      // Replace single line breaks with <br> within paragraphs
+      const formattedP = p.trim().replace(/\n/g, '<br>');
+      return `<p>${formattedP}</p>`;
+    })
+    .join('\n');
+  
+  // Set the letterContent directly (no template needed)
+  letterContent = paragraphs;
+  
+  console.log('📝 Processed paragraphs:', paragraphs);
 } else {
   // Normal template processing
   const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
@@ -833,6 +845,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
