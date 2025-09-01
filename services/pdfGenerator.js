@@ -27,7 +27,7 @@ async function loadCSS(griffithsBase64, lilyWangBase64) {
     
     // Replace font placeholders with actual base64 data
     css = css.replace('GRIFFITHS_BASE64', `data:font/truetype;base64,${griffithsBase64}`);
-    css = css.replace('LILYWANG_BASE64', `data:font/opentype;base64,${lilyWangBase64}`);
+    css = css.replace('LILYWANG_BASE64', `data:font/truetype;base64,${lilyWangBase64}`);
     
     return css;
   } catch (error) {
@@ -809,6 +809,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
