@@ -254,6 +254,93 @@ app.get('/test-labels', async (req, res) => {
   }
 });
 
+// Test endpoint for present labels
+app.get('/test-labels', async (req, res) => {
+  const testData = {
+    orderNumber: "TEST001",
+    childName: "Sophie"
+  };
+  
+  try {
+    const result = await generatePresentLabels(testData);
+    res.send(`
+      <h1>🎁 Present Labels Test</h1>
+      <p>Generated successfully!</p>
+      <p><a href="${result.url}" target="_blank">View PDF</a></p>
+      <p><a href="/">Back to Home</a></p>
+    `);
+  } catch (error) {
+    res.send(`
+      <h1>Error</h1>
+      <p>${error.message}</p>
+      <p><a href="/">Back to Home</a></p>
+    `);
+  }
+});
+
+// ADD THIS NEW TEST ROUTE HERE
+app.get('/test-merge', async (req, res) => {
+  const testData = {
+    orderNumber: "TEST001",
+    template: "Magic & Stardust",
+    font: "Block",
+    letterType: "Individual Letter",
+    childName: "Sophie",
+    letterName: "Sophie",
+    location: "Melbourne",
+    achievement: "learning to ride her bike",
+    psMessage: "keep being awesome",
+    magicalAddress: "123 Snowflake Lane\nNorth Pole",
+    letterYear: "2025"
+  };
+  
+  try {
+    const { getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
+    
+    // Get template filename
+    const templateFilename = getTemplateFilename(
+      testData.template, 
+      testData.letterYear, 
+      testData.letterType
+    );
+    
+    // Fetch template from GitHub
+    const templateHtml = await fetchTemplate(templateFilename);
+    
+    // Process template with data
+    const mergedContent = processTemplateContent(templateHtml, testData);
+    
+    // Convert HTML to plain text
+    const plainText = mergedContent
+      .replace(/<p>/g, '')
+      .replace(/<\/p>/g, '\n\n')
+      .replace(/<span[^>]*>/g, '')
+      .replace(/<\/span>/g, '')
+      .replace(/<br>/g, '\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    
+    let fullLetter = plainText;
+    if (testData.psMessage) {
+      fullLetter += `\n\nP.S. ${testData.psMessage}`;
+    }
+    
+    const envelopeText = `${testData.childName}\n${testData.magicalAddress}`;
+    
+    res.json({
+      success: true,
+      letterText: fullLetter,
+      envelopeText: envelopeText,
+      metadata: testData
+    });
+    
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
 // NEW ENDPOINT: Merge template without generating PDF
 app.post('/merge-template', async (req, res) => {
   try {
@@ -320,6 +407,7 @@ app.post('/merge-template', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
 
 
 
