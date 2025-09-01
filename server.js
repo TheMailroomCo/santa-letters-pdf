@@ -254,9 +254,72 @@ app.get('/test-labels', async (req, res) => {
   }
 });
 
+// NEW ENDPOINT: Merge template without generating PDF
+app.post('/merge-template', async (req, res) => {
+  try {
+    console.log('📝 Merging template for order:', req.body.orderNumber);
+    
+    // Import the functions we need from pdfGenerator
+    const { getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
+    
+    // Get template filename
+    const templateFilename = getTemplateFilename(
+      req.body.template, 
+      req.body.letterYear, 
+      req.body.letterType
+    );
+    
+    // Fetch template from GitHub
+    const templateHtml = await fetchTemplate(templateFilename);
+    
+    // Process template with data (this returns HTML with variables replaced)
+    const mergedContent = processTemplateContent(templateHtml, req.body);
+    
+    // Convert HTML to plain text for Claude review
+    const plainText = mergedContent
+      .replace(/<p>/g, '')
+      .replace(/<\/p>/g, '\n\n')
+      .replace(/<span[^>]*>/g, '')
+      .replace(/<\/span>/g, '')
+      .replace(/<br>/g, '\n')
+      .replace(/<[^>]*>/g, '') // Remove all other HTML tags
+      .replace(/\n{3,}/g, '\n\n') // Clean up excess line breaks
+      .trim();
+    
+    // Add P.S. if exists
+    let fullLetter = plainText;
+    if (req.body.psMessage) {
+      fullLetter += `\n\nP.S. ${req.body.psMessage}`;
+    }
+    
+    // Also prepare envelope text for review
+    const envelopeText = `${req.body.childName || req.body.familyNames || ''}\n${req.body.magicalAddress || ''}`;
+    
+    res.json({
+      success: true,
+      letterText: fullLetter,
+      envelopeText: envelopeText,
+      metadata: {
+        template: req.body.template,
+        font: req.body.font,
+        orderNumber: req.body.orderNumber,
+        childName: req.body.childName
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Template merge error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
 
 
