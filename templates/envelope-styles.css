@@ -43,11 +43,13 @@ body {
   position: absolute;
   width: 100%;
   text-align: center;
-  font-size: 30pt;  /* Increased base size from 28pt to 30pt */
-  line-height: 1.1;  /* Slightly more spacing for multi-line names */
-  padding: 0 20mm;  /* INCREASED padding to keep text well away from decorative border */
+  font-size: 30pt;
+  line-height: 1.1;
+  padding: 0 20mm;
   color: black;
-  /* Removed white-space: pre-wrap to allow natural CSS text wrapping */
+  font-variant-ligatures: none;  /* Disable ligatures */
+  font-feature-settings: "liga" 0, "clig" 0;  /* Turn off all ligatures */
+  font-kerning: none;  /* Disable kerning */
 }
 
 /* Address positioning - will be positioned dynamically by JS */
@@ -62,6 +64,7 @@ body {
   /* Removed white-space: pre-wrap to allow natural CSS text wrapping */
 
 }
+
 
 
 
