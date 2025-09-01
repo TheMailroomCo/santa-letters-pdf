@@ -607,20 +607,23 @@ async function generatePDF(orderData) {
 if (orderData.directLetterContent) {
   console.log('📝 Using corrected text directly');
   
-  // Convert plain text to HTML paragraphs
-  const paragraphs = orderData.directLetterContent
+  let fullText = orderData.directLetterContent;
+  let psContent = '';
+  
+  // Check for P.S. and extract it
+  const psMatch = fullText.match(/\n\nP\.S\.\s+(.+)$/);
+  if (psMatch) {
+    psContent = psMatch[1];
+    fullText = fullText.replace(psMatch[0], '').trim();
+    // Set the P.S. message for separate handling
+    orderData.psMessage = psContent;
+  }
+  
+  // Convert the remaining text to HTML paragraphs
+  const paragraphs = fullText
     .split('\n\n')
     .filter(p => p.trim())
-    .map(p => {
-      // Check if it's the P.S. line
-      if (p.startsWith('P.S.')) {
-        // Extract P.S. for separate handling
-        orderData.psMessage = p.replace('P.S.', '').trim();
-        return ''; // Don't include in main content
-      }
-      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
-    })
-    .filter(p => p) // Remove empty strings
+    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
     .join('\n');
   
   letterContent = paragraphs;
@@ -835,6 +838,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
