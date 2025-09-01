@@ -319,12 +319,12 @@ app.post('/merge-template', async (req, res) => {
     console.log('📝 Merging template for order:', req.body.orderNumber);
     console.log('📦 Full request body:', JSON.stringify(req.body, null, 2));
     
-    // Validate required fields
-    if (!req.body.template || !req.body.letterType) {
-      console.error('❌ Missing required fields');
+    // Validate required fields - letterType is always required
+    if (!req.body.letterType) {
+      console.error('❌ Missing required letterType');
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: template or letterType'
+        error: 'Missing required field: letterType'
       });
     }
     
