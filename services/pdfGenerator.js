@@ -38,29 +38,24 @@ async function loadCSS(griffithsBase64, lilyWangBase64) {
 // Convert Shopify template name to GitHub filename
 function getTemplateFilename(templateName, letterYear, letterType) {
   // Individual Letter (Backdated) should use the template field even if it exists
-  // For backdated individual letters, the template IS required
   if (letterType === 'Individual Letter (Backdated)') {
-    // Individual backdated MUST have a template selected
     if (!templateName) {
       console.error('❌ Individual Letter (Backdated) requires a template but none provided');
-      // Default to a safe fallback or throw error
       throw new Error('Individual Letter (Backdated) requires a template selection');
     }
-    // Use the template map below to get the right file
   }
   
   // Handle letter types that don't use template field
-if (!templateName || templateName === '') {
-  if (letterType === 'Write Your Own Letter') {
-    return 'write-your-own.html';
-  }
-  if (letterType === 'Toddler Letter' || letterType === 'Toddler' || letterType === 'Toddler Letter (Second Christmas)') {
-    return 'toddler-letter.html';
-}
+  if (!templateName || templateName === '') {
+    if (letterType === 'Write Your Own Letter') {
+      return 'write-your-own.html';
+    }
+    if (letterType === 'Toddler Letter' || letterType === 'Toddler' || letterType === 'Toddler Letter (Second Christmas)') {
+      return 'toddler-letter.html';
+    }
 
-  // Check if letterType contains "Family Letter"
-  if (letterType && letterType.includes('Family Letter')) {
-      // Check if it's backdated based on the letterType string
+    // Check if letterType contains "Family Letter"
+    if (letterType && letterType.includes('Family Letter')) {
       if (letterType.includes('Backdated')) {
         return 'family-letter-backdated.html';
       }
@@ -81,32 +76,31 @@ if (!templateName || templateName === '') {
   }
   
   // Convert template name to kebab-case filename
-  // Convert template name to kebab-case filename
-const templateMap = {
-  'The Grand Library of Kind Hearts': 'the-grand-library-of-kind-hearts.html',
-  'Snow Globe Heart': 'snow-globe-heart.html',
-  'The Brave One': 'the-brave-one.html',
-  'Royal Winter Gala': 'royal-winter-gala.html',
-  'Magic and Stardust': 'magic-and-stardust.html',
-  'Magic & Stardust': 'magic-and-stardust.html',
-  'The Watchful Elf': 'the-watchful-elf.html',
-  'The Helpful Reindeer': 'the-helpful-reindeer.html',
-  'The Night Sky': 'the-night-sky.html',
-  "Baby's First Christmas": 'babys-first-christmas.html',
-  'Non-Believer Letter': 'non-believer-letter.html',
-  'Write Your Own Letter': 'write-your-own.html',
-  'Write Your Own': 'write-your-own.html',
-  'Toddler Letter': 'toddler-letter.html',
-  'Toddler': 'toddler-letter.html',  // ADD COMMA HERE
-  'Toddler Letter (Second Christmas)': 'toddler-letter.html'
-};
+  const templateMap = {
+    'The Grand Library of Kind Hearts': 'the-grand-library-of-kind-hearts.html',
+    'Snow Globe Heart': 'snow-globe-heart.html',
+    'The Brave One': 'the-brave-one.html',
+    'Royal Winter Gala': 'royal-winter-gala.html',
+    'Magic and Stardust': 'magic-and-stardust.html',
+    'Magic & Stardust': 'magic-and-stardust.html',
+    'The Watchful Elf': 'the-watchful-elf.html',
+    'The Helpful Reindeer': 'the-helpful-reindeer.html',
+    'The Night Sky': 'the-night-sky.html',
+    "Baby's First Christmas": 'babys-first-christmas.html',
+    'Non-Believer Letter': 'non-believer-letter.html',
+    'Write Your Own Letter': 'write-your-own.html',
+    'Write Your Own': 'write-your-own.html',
+    'Toddler Letter': 'toddler-letter.html',
+    'Toddler': 'toddler-letter.html',
+    'Toddler Letter (Second Christmas)': 'toddler-letter.html'
+  };
   
   return templateMap[templateName] || kebabCase(templateName) + '.html';
 }
 
 // Convert string to kebab-case
 function kebabCase(str) {
-  if (!str) return '';  // This fixes the null error
+  if (!str) return '';
   return str
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -133,98 +127,72 @@ function processTemplateContent(templateHtml, orderData) {
   
   // Handle Write Your Own Letter FIRST, before other replacements
   if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
-    // First, check what we're receiving
     console.log('🔍 Raw achievement:', orderData.achievement);
-    console.log('🔍 Raw achievement character codes:', orderData.achievement.split('').slice(0, 100).map(c => c.charCodeAt(0)));
     
     let content = orderData.achievement;
     
     // Handle different types of line breaks that might come from Make.com
-    // First, normalize all line breaks to a consistent format
     content = content
       .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines
       .replace(/\r\n/g, '\n') // Convert Windows line breaks
       .replace(/\r/g, '\n');  // Convert old Mac line breaks
     
     console.log('📝 Content after normalization:', content);
-    console.log('📝 Looking for double newlines:', content.includes('\n\n'));
     
     let paragraphs;
     
     // Check if we have <br> tags
     if (content.includes('<br>')) {
       console.log('📝 Found <br> tags, processing as HTML');
-      // Look for double <br> as paragraph separators
       if (content.includes('<br><br>') || content.includes('<br> <br>')) {
-        // Split on double <br> tags for paragraphs
         paragraphs = content
           .split(/<br>\s*<br>/)
           .filter(p => p.trim())
-          .map(p => {
-            // Keep single <br> tags within paragraphs
-            const cleaned = p.trim();
-            return `<p>${cleaned}</p>`;
-          })
+          .map(p => `<p>${p.trim()}</p>`)
           .join('\n');
       } else {
-        // No double <br>, so treat the whole thing as one paragraph with line breaks
         paragraphs = `<p>${content.trim()}</p>`;
       }
     } 
-    // Otherwise use newlines
     else {
       console.log('📝 Processing newline-separated content');
       
-      // Check if we have double newlines (paragraph breaks)
       if (content.includes('\n\n')) {
         console.log('📝 Found double newlines, treating as paragraph breaks');
-        // Split on double newlines for paragraphs
         paragraphs = content
-          .split(/\n\s*\n/)  // Split on double newlines
+          .split(/\n\s*\n/)
           .filter(p => p.trim())
           .map(p => {
-            // Keep single newlines as <br> within paragraphs
             const cleaned = p.trim().replace(/\n/g, '<br>');
             return `<p>${cleaned}</p>`;
           })
           .join('\n');
       } else {
         console.log('📝 No double newlines found, treating as single paragraph with line breaks');
-        // No double newlines, so it's all one paragraph with line breaks
-        // Replace single newlines with <br> tags
         const lines = content.trim().replace(/\n/g, '<br>');
         paragraphs = `<p>${lines}</p>`;
       }
     }
     
     console.log('📝 Generated HTML:', paragraphs);
-    console.log('📊 Number of paragraphs created:', (paragraphs.match(/<p>/g) || []).length);
-    
-    // Replace the {achievement} placeholder with our formatted paragraphs
     processedHtml = processedHtml.replace('{achievement}', paragraphs);
     
-    console.log('✅ Replaced achievement placeholder');
-    console.log('📄 Final content preview:', processedHtml.substring(0, 500));
-    console.log('🎨 Font inheritance check - container has font class:', orderData.font);
-    
-    return processedHtml;  // Return early, skip other processing for Write Your Own
+    return processedHtml;
   }
   
-  // Process pronouns based on parentPronouns field
+  // Process pronouns
   let pronouns = {
     they: 'They',
     their: 'their',
     Their: 'Their'
   };
   
-  // If single parent, use their pronouns
   if (orderData.parentPronouns) {
     if (orderData.parentPronouns.includes('she')) {
       pronouns = { they: 'She', their: 'her', Their: 'Her' };
     } else if (orderData.parentPronouns.includes('he')) {
       pronouns = { they: 'He', their: 'his', Their: 'His' };
     }
-    // Keep default they/their if pronouns are they/them or not specified
   }
   
   // Map of placeholders to data fields
@@ -246,8 +214,8 @@ function processTemplateContent(templateHtml, orderData) {
     '{numberOfChristmases}': orderData.numberOfChristmases || '',
     '{characteristics}': orderData.characteristics || '',
     '{letterYear}': orderData.letterYear || '2025',
-    '{font}': orderData.font || '',  // No default - should come from Shopify (Fancy or Block)
-    '{envelopeColor}': orderData.envelopeColor || '',  // No default - should come from Shopify (Red or Green)
+    '{font}': orderData.font || '',
+    '{envelopeColor}': orderData.envelopeColor || '',
     '{pronoun_They}': pronouns.they,
     '{pronoun_their}': pronouns.their,
     '{pronoun_Their}': pronouns.Their,
@@ -256,32 +224,29 @@ function processTemplateContent(templateHtml, orderData) {
   
   // Replace all placeholders
   Object.entries(placeholderMap).forEach(([placeholder, value]) => {
-    // Escape special characters in the value for HTML
     const escapedValue = escapeHtml(value);
     const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
     processedHtml = processedHtml.replace(regex, escapedValue);
   });
   
-  return processedHtml;  // Return for all other letter types
+  return processedHtml;
 }
 
 // Escape HTML special characters
 function escapeHtml(text) {
   if (!text) return '';
   
-  // Check if this text has <br> tags that should be preserved
   if (text.includes('<br>')) {
     return text
-      .replace(/<br>/g, '|||LINEBREAK|||')  // Temporarily hide <br>
+      .replace(/<br>/g, '|||LINEBREAK|||')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
-      .replace(/\|\|\|LINEBREAK\|\|\|/g, '<br>');  // Restore <br>
+      .replace(/\|\|\|LINEBREAK\|\|\|/g, '<br>');
   }
   
-  // Normal escaping for other fields
   const map = {
     '&': '&amp;',
     '<': '&lt;',
@@ -296,7 +261,6 @@ function escapeHtml(text) {
 // Dynamic text sizing script for letters
 function getDynamicSizingScript() {
   return `
-    // Wait for fonts to load
     setTimeout(() => {
       const container = document.querySelector('.letter-content');
       if (!container) return;
@@ -304,12 +268,10 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Starting font sizes in pt (converted from rem)
-      let fontSize = isFancy ? 28 : 30; // Larger for Block since spacing is tighter
-      const minSize = 10.8; // 0.9rem
-      const maxSize = 45; // Larger max for Block
+      let fontSize = isFancy ? 28 : 30;
+      const minSize = 10.8;
+      const maxSize = 45;
       
-      // Binary search for best fit
       let low = minSize;
       let high = maxSize;
       let bestFit = fontSize;
@@ -317,11 +279,9 @@ function getDynamicSizingScript() {
       for (let attempts = 0; attempts < 25; attempts++) {
         const mid = (low + high) / 2;
         
-        // Apply test size
         container.querySelectorAll('p').forEach(p => {
           p.style.fontSize = mid + 'pt';
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
-          // IMPORTANT: Preserve font family and text stroke for block font
           if (isBlockFont) {
             p.style.fontFamily = 'Griffiths, Georgia, serif';
             p.style.webkitTextStroke = '0.142pt #000000';
@@ -331,32 +291,24 @@ function getDynamicSizingScript() {
           }
         });
         
-        // Force reflow
         container.offsetHeight;
         
-        // Check if content fits
         const containerHeight = container.clientHeight;
         const contentHeight = container.scrollHeight;
         
-        // We want to use as much space as possible
         if (contentHeight <= containerHeight) {
-          // Content fits, try larger
           bestFit = mid;
           low = mid;
         } else {
-          // Content overflows, try smaller
           high = mid;
         }
         
-        // Stop if we're close enough (0.1pt precision)
         if (high - low < 0.1) break;
       }
       
-      // Apply best fit to all paragraphs with font styles
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
-        // IMPORTANT: Apply font family and stroke
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
           p.style.webkitTextStroke = '0.142pt #000000';
@@ -372,11 +324,9 @@ function getDynamicSizingScript() {
       if (psMessage && psInner) {
         const psText = psInner.querySelector('p');
         if (psText) {
-          // Start with SAME size as main text (inherit)
           psText.style.fontSize = bestFit + 'pt';
-          psText.style.lineHeight = '1.05'; // Tight spacing for P.S.
+          psText.style.lineHeight = '1.05';
           
-          // Apply font styles to P.S. as well
           if (isBlockFont) {
             psText.style.fontFamily = 'Griffiths, Georgia, serif';
             psText.style.webkitTextStroke = '0.142pt #000000';
@@ -385,22 +335,17 @@ function getDynamicSizingScript() {
             psText.style.fontFamily = 'LilyWang, cursive';
           }
           
-          // Check if it overflows after a brief delay
           setTimeout(() => {
             const psHeight = psMessage.clientHeight;
             const psContentHeight = psInner.scrollHeight;
             
-            // Only scale down if it actually overflows
             if (psContentHeight > psHeight) {
-              // Less aggressive reduction - start at 90%
               psText.style.fontSize = (bestFit * 0.9) + 'pt';
               
-              // Check again - if still too big, go to 80%
               setTimeout(() => {
                 if (psInner.scrollHeight > psHeight) {
                   psText.style.fontSize = (bestFit * 0.8) + 'pt';
                   
-                  // Last resort - 70%
                   setTimeout(() => {
                     if (psInner.scrollHeight > psHeight) {
                       psText.style.fontSize = (bestFit * 0.7) + 'pt';
@@ -434,71 +379,43 @@ async function loadEnvelopeCSS(lilyWangBase64) {
 // Script to handle dynamic centering of envelope text
 function getEnvelopeScript() {
   return `
-    // Center text vertically while keeping improved positioning logic
     setTimeout(() => {
       const nameElement = document.querySelector('.envelope-name');
       const addressElement = document.querySelector('.envelope-address');
       
       if (nameElement && addressElement) {
-        // Log the text being displayed
         const nameText = nameElement.textContent || '';
-        const nameLines = nameText.split('\\n').length;
         
-        console.log('📝 Name text:', nameText);
-        console.log('📏 Name lines:', nameLines);
-        console.log('📏 Name length:', nameText.length, 'characters');
-        
-        // Dynamic font sizing for very long names
-        let nameFontSize = 30; // Increased default size from 28pt to 30pt
-        
-        // Count actual rendered lines after wrapping
+        let nameFontSize = 30;
         const originalHeight = nameElement.offsetHeight;
         const lineHeight = parseFloat(getComputedStyle(nameElement).lineHeight);
         const actualLines = Math.round(originalHeight / lineHeight);
         
-        console.log('📏 Actual rendered lines:', actualLines);
-        
-        // Reduce font size for long names or multiple lines (all sizes increased by 2pt)
         if (nameText.length > 90 || actualLines >= 3) {
-          nameFontSize = 26; // Increased from 24pt to 26pt for 90+ chars or 3+ lines
+          nameFontSize = 26;
         } else if (nameText.length > 70 || actualLines === 2) {
-          nameFontSize = 28; // Increased from 26pt to 28pt for 70+ chars or 2 lines
+          nameFontSize = 28;
         } else if (nameText.length > 50) {
-          nameFontSize = 29; // Increased from 27pt to 29pt for 50+ chars
+          nameFontSize = 29;
         }
-        // Under 50 characters uses 30pt (the default)
         
-        // Apply the calculated font size
         nameElement.style.fontSize = nameFontSize + 'pt';
         
-        console.log('📏 Using font size:', nameFontSize + 'pt');
-        
-        // Force reflow to get accurate measurements after font size change
         nameElement.offsetHeight;
         addressElement.offsetHeight;
         
-        // Get heights after text is rendered
         const nameHeight = nameElement.offsetHeight;
         const addressHeight = addressElement.offsetHeight;
-        const gap = 8 * (96/72); // Reduced gap from 16px to 8px for closer spacing
+        const gap = 8 * (96/72);
         
-        // Total height of text block
         const totalHeight = nameHeight + gap + addressHeight;
+        const availableSpace = 50 * 3.7795;
+        const topBoundary = 70 * 3.7795;
         
-        // Available space: from 70mm to 120mm (50mm of space) - keeping improved spacing
-        const availableSpace = 50 * 3.7795; // Convert to pixels
-        const topBoundary = 70 * 3.7795; // Start 70mm from top (improved positioning)
-        
-        // Center the text block in available space
         const topOffset = topBoundary + (availableSpace - totalHeight) / 2;
         
-        // Position name at calculated offset
         nameElement.style.top = (topOffset / 3.7795) + 'mm';
-        
-        // Position address below name with builder-specified gap
         addressElement.style.top = ((topOffset + nameHeight + gap) / 3.7795) + 'mm';
-        
-        console.log('📐 Positioning: Name at', (topOffset / 3.7795).toFixed(1) + 'mm, Address at', ((topOffset + nameHeight + gap) / 3.7795).toFixed(1) + 'mm');
       }
     }, 100);
   `;
@@ -508,37 +425,36 @@ function getEnvelopeScript() {
 async function generateEnvelope(orderData, lilyWangBase64) {  
   const css = await loadEnvelopeCSS(lilyWangBase64);
   
-  // Format the name - convert newlines to <br> for HTML
-const envelopeName = orderData.childName || orderData.familyNames || '';
+  const envelopeName = orderData.childName || orderData.familyNames || '';
 
-// Convert LITERAL \n characters AND actual newlines to <br> tags
-const formattedEnvelopeName = envelopeName
-  .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines first
-  .split('\n')
-  .map(line => line.trim())
-  .filter(line => line.length > 0)
-  .join('<br>');
+  // Handle literal \n characters AND actual newlines
+  const formattedEnvelopeName = envelopeName
+    .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines first
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .join('<br>');
     
-  console.log('📝 Name for envelope (preserving user line breaks):', envelopeName.replace(/\n/g, ' | '));
+  console.log('📝 Name for envelope:', envelopeName.replace(/\n/g, ' | '));
   console.log('📝 Formatted for HTML:', formattedEnvelopeName);
   
-  // Format the address - preserve exact line breaks as intended
   let magicalAddress = orderData.magicalAddress || '';
   
-  // First check for actual line breaks (preferred method)
+  // Handle literal \n characters first
+  magicalAddress = magicalAddress.replace(/\\n/g, '\n');
+
   if (magicalAddress.includes('\n')) {
     magicalAddress = magicalAddress
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.length > 0)  // Remove empty lines
+      .filter(line => line.length > 0)
       .join('<br>');
   } 
-  // Fallback: check for pipe delimiters
   else if (magicalAddress.includes('|')) {
     magicalAddress = magicalAddress
       .split('|')
       .map(line => line.trim())
-      .filter(line => line.length > 0)  // Remove empty lines
+      .filter(line => line.length > 0)
       .join('<br>');
   }
   
@@ -552,8 +468,6 @@ const formattedEnvelopeName = envelopeName
   <style>${css}</style>
 </head>
 <body>
-  
-  
   <div class="envelope-container">
     <div class="envelope-name">
       ${formattedEnvelopeName}
@@ -572,11 +486,10 @@ const formattedEnvelopeName = envelopeName
   return html;
 }
 
-// Main PDF generation function (now generates both letter and envelope)
+// Main PDF generation function
 async function generatePDF(orderData) {
   console.log('🎅 Generating PDFs for order:', orderData.orderNumber);
    
-  // Declare cleanOrderNumber ONCE at the top
   const cleanOrderNumber = orderData.orderNumber.replace('#', '');
   
   const browser = await puppeteer.launch({
@@ -588,7 +501,6 @@ async function generatePDF(orderData) {
   });
 
   try {
-    // Load all assets as base64  
     const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
     const backgroundBase64 = await fileToBase64(path.join(__dirname, '../background.png'));
@@ -596,74 +508,71 @@ async function generatePDF(orderData) {
     // === GENERATE LETTER ===
     const letterPage = await browser.newPage();
     await letterPage.setViewport({
-      width: 680,  // 180mm at 96 DPI
-      height: 906  // 240mm at 96 DPI
+      width: 680,
+      height: 906
     });
 
-    // Load CSS with fonts embedded
     const styles = await loadCSS(griffithsBase64, lilyWangBase64);
 
     let letterContent;
+    let finalTextForFile; // This will hold the corrected text for the .txt file
 
-// Check if we're using corrected text directly
-if (orderData.directLetterContent) {
-  console.log('📝 Using corrected text directly');
-  console.log('📝 Raw text received:', orderData.directLetterContent);
-  
-  let fullText = orderData.directLetterContent;
-  
-  // Handle literal \n characters that might come from Make.com/Claude
-  fullText = fullText.replace(/\\n/g, '\n');
-  console.log('📝 After converting literal \\n:', fullText);
-  
-  // Extract P.S. message from the corrected text
-  const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
-  if (psMatch) {
-    orderData.psMessage = psMatch[1];
-    // Remove P.S. from the main content
-    fullText = fullText.substring(0, psMatch.index).trim();
-    console.log('📝 Extracted P.S.:', orderData.psMessage);
-    console.log('📝 Letter content without P.S.:', fullText);
-  }
-  
-  // Convert paragraphs to HTML format
-  let paragraphs;
-  
-  // Check if we have clear paragraph breaks (double newlines)
-  if (fullText.includes('\n\n')) {
-    console.log('📝 Found double newlines - treating as paragraph breaks');
-    paragraphs = fullText
-      .split('\n\n')
-      .filter(p => p.trim()) // Remove empty paragraphs
-      .map(p => {
-        // Replace single line breaks with <br> within paragraphs
-        const formattedP = p.trim().replace(/\n/g, '<br>');
-        return `<p>${formattedP}</p>`;
-      })
-      .join('\n');
-  } else {
-    console.log('📝 No double newlines found - creating single paragraph with line breaks');
-    // If no clear paragraph breaks, make one paragraph with line breaks
-    paragraphs = `<p>${fullText.trim().replace(/\n/g, '<br>')}</p>`;
-  }
-  
-  // Set the letterContent directly (no template needed)
-  letterContent = paragraphs;
-  
-  console.log('📝 Final processed paragraphs:', paragraphs.substring(0, 300) + '...');
-  console.log('📝 Number of <p> tags created:', (paragraphs.match(/<p>/g) || []).length);
-} else {
-  // Normal template processing
-  const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
-  console.log(`📄 Using template: ${templateFilename}`);
-  const templateHtml = await fetchTemplate(templateFilename);
-  letterContent = processTemplateContent(templateHtml, orderData);
-}
+    // Check if we're using corrected text directly
+    if (orderData.directLetterContent) {
+      console.log('📝 Using corrected text directly');
+      console.log('📝 Raw text received:', orderData.directLetterContent);
+      
+      let fullText = orderData.directLetterContent;
+      
+      // Handle literal \n characters
+      fullText = fullText.replace(/\\n/g, '\n');
+      console.log('📝 After converting literal \\n:', fullText);
+      
+      // Extract P.S. message
+      const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
+      if (psMatch) {
+        orderData.psMessage = psMatch[1];
+        fullText = fullText.substring(0, psMatch.index).trim();
+        console.log('📝 Extracted P.S.:', orderData.psMessage);
+      }
+      
+      // Store the corrected text for the .txt file
+      finalTextForFile = fullText;
+      if (orderData.psMessage) {
+        finalTextForFile += `\n\nP.S. ${orderData.psMessage}`;
+      }
+      
+      // Convert to HTML for PDF rendering
+      let paragraphs;
+      if (fullText.includes('\n\n')) {
+        console.log('📝 Found double newlines - treating as paragraph breaks');
+        paragraphs = fullText
+          .split('\n\n')
+          .filter(p => p.trim())
+          .map(p => {
+            const formattedP = p.trim().replace(/\n/g, '<br>');
+            return `<p>${formattedP}</p>`;
+          })
+          .join('\n');
+      } else {
+        console.log('📝 No double newlines found - creating single paragraph with line breaks');
+        paragraphs = `<p>${fullText.trim().replace(/\n/g, '<br>')}</p>`;
+      }
+      
+      letterContent = paragraphs;
+      console.log('📝 Final processed paragraphs:', paragraphs.substring(0, 300) + '...');
+    } else {
+      // Normal template processing
+      const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
+      console.log(`📄 Using template: ${templateFilename}`);
+      const templateHtml = await fetchTemplate(templateFilename);
+      letterContent = processTemplateContent(templateHtml, orderData);
+      
+      // For normal templates, we'll extract text from the rendered page
+      finalTextForFile = null; // Will be extracted from rendered page
+    }
 
-    // Determine font class
     const fontClass = orderData.font === 'Fancy' ? 'fancy-font' : 'block-font';
-    
-    // Determine year
     const year = orderData.letterYear || '2025';
 
     // Build letter HTML
@@ -672,14 +581,9 @@ if (orderData.directLetterContent) {
 <html>
 <head>
   <meta charset="UTF-8">
-  <style>
-    ${styles}
-  </style>
+  <style>${styles}</style>
 </head>
 <body>
-  <!-- Background image commented out for testing -->
-  <!-- <img src="data:image/png;base64,${backgroundBase64}" class="background-image" alt="" /> -->
-  
   <div class="letter-container ${fontClass}">
     <div class="date-display">
       <span>${year}</span>
@@ -698,28 +602,14 @@ if (orderData.directLetterContent) {
     ` : ''}
   </div>
   
-  <script>
-    ${getDynamicSizingScript()}
-  </script>
+  <script>${getDynamicSizingScript()}</script>
 </body>
 </html>
     `;
 
-    // CSS DEBUG CODE for Write Your Own
-    if (orderData.letterType === 'Write Your Own Letter') {
-      console.log('🎨 CSS Debug for Write Your Own:');
-      console.log('  Font class being used:', fontClass);
-      console.log('  Font value from order:', orderData.font);
-      console.log('  Letter content preview (first 500 chars):', letterContent.substring(0, 500));
-      console.log('  Letter content includes <p> tags:', letterContent.includes('<p>'));
-      console.log('  Full HTML includes letter-content div:', letterHtml.includes('class="letter-content"'));
-      console.log('  Font class in container:', letterHtml.includes(`class="letter-container ${fontClass}"`));
-    }
-
     // Ensure output directory exists
     const outputDir = path.join(__dirname, '../output');
     await fs.mkdir(outputDir, { recursive: true });
-    console.log('📁 Output directory ready:', outputDir);
 
     // Set content and generate letter PDF
     await letterPage.setContent(letterHtml, { waitUntil: 'networkidle0' });
@@ -731,69 +621,71 @@ if (orderData.directLetterContent) {
       margin: { top: 0, right: 0, bottom: 0, left: 0 }
     });
     
-    // Create a clean filename using letterName, childrenNames, familyNames, or "Unknown" as fallback
+    // Create filename
     const nameForFile = orderData.letterName || orderData.childrenNames || orderData.familyNames || orderData.childName || 'Unknown';
     const nameClean = nameForFile
-      .replace(/[^a-z0-9]/gi, '-')  // Replace non-alphanumeric with dashes
-      .replace(/-+/g, '-')           // Replace multiple dashes with single
-      .replace(/^-|-$/g, '')         // Remove leading/trailing dashes
+      .replace(/[^a-z0-9]/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
       .toLowerCase()
-      .substring(0, 50);             // Limit length
+      .substring(0, 50);
     
     // Save letter PDF
     const letterFilename = `order-${cleanOrderNumber}-${nameClean}-letter.pdf`;
     const letterFilepath = path.join(__dirname, '../output', letterFilename);
     await fs.writeFile(letterFilepath, letterPdfBuffer);
-    console.log('✅ Letter PDF saved to:', letterFilepath);
-    console.log('📄 Letter file size:', letterPdfBuffer.length, 'bytes');
+    console.log('✅ Letter PDF saved:', letterFilename);
     
-    // Generate plain text version for editing - MOVED HERE (BEFORE letterPage.close())
+    // Generate text file - use corrected text if available, otherwise extract from page
     const textFilename = `order-${cleanOrderNumber}-${nameClean}-letter.txt`;
     const textFilepath = path.join(__dirname, '../output', textFilename);
 
-    // Extract ONLY text from the page, no images or backgrounds
-    const plainText = await letterPage.evaluate(() => {
-      const content = document.querySelector('.letter-content');
-      if (!content) return '';
-      
-      // Get all paragraphs and extract ONLY their text content
-      const paragraphs = content.querySelectorAll('p');
-      const textArray = [];
-      
-      paragraphs.forEach(p => {
-        // Get only the text, no HTML or images
-        const text = p.innerText || p.textContent || '';
-        const cleanText = text.trim();
-        if (cleanText && cleanText.length > 0) {
-          textArray.push(cleanText);
-        }
+    let finalText;
+    if (finalTextForFile) {
+      // Use the corrected text we stored earlier
+      finalText = finalTextForFile;
+      console.log('📝 Using corrected text for .txt file');
+    } else {
+      // Extract from rendered page (for normal templates)
+      const plainText = await letterPage.evaluate(() => {
+        const content = document.querySelector('.letter-content');
+        if (!content) return '';
+        
+        const paragraphs = content.querySelectorAll('p');
+        const textArray = [];
+        
+        paragraphs.forEach(p => {
+          const text = p.innerText || p.textContent || '';
+          const cleanText = text.trim();
+          if (cleanText && cleanText.length > 0) {
+            textArray.push(cleanText);
+          }
+        });
+        
+        return textArray.join('\n\n');
       });
-      
-      return textArray.join('\n\n');
-    });
 
-    // Add P.S. message if it exists
-    let finalText = plainText;
-    if (orderData.psMessage) {
-      // Make sure psMessage is clean text only
-      const cleanPS = orderData.psMessage.replace(/<[^>]*>/g, '').trim();
-      if (cleanPS) {
-        finalText += `\n\nP.S. ${cleanPS}`;
+      finalText = plainText;
+      if (orderData.psMessage) {
+        const cleanPS = orderData.psMessage.replace(/<[^>]*>/g, '').trim();
+        if (cleanPS) {
+          finalText += `\n\nP.S. ${cleanPS}`;
+        }
       }
     }
 
-    // Save text file alongside PDF
+    // Save text file
     await fs.writeFile(textFilepath, finalText, 'utf8');
     console.log('📝 Text file saved:', textFilename);
+    console.log('📝 Text content preview:', finalText.substring(0, 200) + '...');
     
-    // NOW close the letter page
     await letterPage.close();
     
     // === GENERATE ENVELOPE ===
     const envelopePage = await browser.newPage();
     await envelopePage.setViewport({
-      width: 718,  // 190mm at 96 DPI
-      height: 491  // 130mm at 96 DPI
+      width: 718,
+      height: 491
     });
     
     const envelopeHtml = await generateEnvelope(orderData, lilyWangBase64);
@@ -811,22 +703,12 @@ if (orderData.directLetterContent) {
     const envelopeFilename = `order-${cleanOrderNumber}-${nameClean}-envelope.pdf`;
     const envelopeFilepath = path.join(__dirname, '../output', envelopeFilename);
     await fs.writeFile(envelopeFilepath, envelopePdfBuffer);
-    console.log('✅ Envelope PDF saved to:', envelopeFilepath);
-    console.log('📄 Envelope file size:', envelopePdfBuffer.length, 'bytes');
+    console.log('✅ Envelope PDF saved:', envelopeFilename);
     
     await envelopePage.close();
-    
     console.log('✅ Both PDFs generated successfully');
     
-    // Debug logging before return
-    console.log('🔍 DEBUG - Variables before return:');
-    console.log('  letterFilename:', letterFilename);
-    console.log('  textFilename:', textFilename);
-    console.log('  envelopeFilename:', envelopeFilename);
-    console.log('  typeof textFilename:', typeof textFilename);
-    console.log('  typeof textFilepath:', typeof textFilepath);
-    
-    const returnObject = {
+    return {
       success: true,
       letter: {
         filename: letterFilename,
@@ -844,11 +726,6 @@ if (orderData.directLetterContent) {
         url: `/pdfs/${envelopeFilename}`
       }
     };
-    
-    console.log('📦 DEBUG - Return object:', JSON.stringify(returnObject, null, 2));
-    
-    // Return with all three properties including letterText
-    return returnObject;
   } catch (error) {
     console.error('❌ PDF Generation Error:', error);
     throw error;
@@ -863,20 +740,3 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
