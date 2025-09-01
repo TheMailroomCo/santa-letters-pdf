@@ -606,25 +606,52 @@ async function generatePDF(orderData) {
 // Check if we're using corrected text directly
 if (orderData.directLetterContent) {
   console.log('📝 Using corrected text directly');
+  console.log('📝 Raw text:', orderData.directLetterContent);
+  console.log('📝 Text includes \\n\\n:', orderData.directLetterContent.includes('\n\n'));
+  console.log('📝 Text includes \\n:', orderData.directLetterContent.includes('\n'));
   
   let fullText = orderData.directLetterContent;
   let psContent = '';
   
-  // Check for P.S. and extract it
-  const psMatch = fullText.match(/\n\nP\.S\.\s+(.+)$/);
+  // Check for P.S. with different possible formats
+  const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
   if (psMatch) {
     psContent = psMatch[1];
-    fullText = fullText.replace(psMatch[0], '').trim();
-    // Set the P.S. message for separate handling
+    fullText = fullText.substring(0, psMatch.index).trim();
     orderData.psMessage = psContent;
   }
   
-  // Convert the remaining text to HTML paragraphs
-  const paragraphs = fullText
-    .split('\n\n')
-    .filter(p => p.trim())
-    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
-    .join('\n');
+  // If there are no double line breaks, create paragraphs based on sentence structure
+  let paragraphs;
+  if (fullText.includes('\n\n')) {
+    // Use existing paragraph breaks
+    paragraphs = fullText
+      .split('\n\n')
+      .filter(p => p.trim())
+      .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+      .join('\n');
+  } else {
+    // Create paragraphs manually - split after "Dear" greeting and other logical breaks
+    const lines = fullText.split('\n').filter(line => line.trim());
+    const formattedParagraphs = [];
+    let currentParagraph = [];
+    
+    lines.forEach(line => {
+      currentParagraph.push(line);
+      // Start new paragraph after greeting or if line ends with common endings
+      if (line.includes('My dearest') || line.includes('With all my love')) {
+        formattedParagraphs.push(`<p>${currentParagraph.join(' ')}</p>`);
+        currentParagraph = [];
+      }
+    });
+    
+    // Add any remaining lines
+    if (currentParagraph.length > 0) {
+      formattedParagraphs.push(`<p>${currentParagraph.join(' ')}</p>`);
+    }
+    
+    paragraphs = formattedParagraphs.join('\n');
+  }
   
   letterContent = paragraphs;
 } else {
@@ -838,6 +865,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
