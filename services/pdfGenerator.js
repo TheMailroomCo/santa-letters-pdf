@@ -508,9 +508,18 @@ function getEnvelopeScript() {
 async function generateEnvelope(orderData, lilyWangBase64) {  
   const css = await loadEnvelopeCSS(lilyWangBase64);
   
-  // Format the name - preserve exactly as user entered (like builder does with pre-wrap)
+  // Format the name - convert newlines to <br> for HTML
   const envelopeName = orderData.childName || orderData.familyNames || '';
+  
+  // Convert newlines to <br> tags for proper HTML rendering
+  const formattedEnvelopeName = envelopeName
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .join('<br>');
+    
   console.log('📝 Name for envelope (preserving user line breaks):', envelopeName.replace(/\n/g, ' | '));
+  console.log('📝 Formatted for HTML:', formattedEnvelopeName);
   
   // Format the address - preserve exact line breaks as intended
   let magicalAddress = orderData.magicalAddress || '';
@@ -546,7 +555,7 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   
   <div class="envelope-container">
     <div class="envelope-name">
-      ${envelopeName}
+      ${formattedEnvelopeName}
     </div>
     
     <div class="envelope-address">
@@ -799,6 +808,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
