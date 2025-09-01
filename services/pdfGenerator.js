@@ -11,7 +11,8 @@ const GITHUB_TEMPLATE_BASE = 'https://raw.githubusercontent.com/TheMailroomCo/sa
 async function fileToBase64(filePath) {
   try {
     const file = await fs.readFile(filePath);
-    return file.toString('base64');
+    // Use Buffer.from to ensure proper binary encoding
+    return Buffer.from(file).toString('base64');
   } catch (error) {
     console.error('Error reading file:', filePath, error);
     return null;
@@ -808,6 +809,7 @@ async function generatePDF(orderData) {
 }
 
 module.exports = { generatePDF };
+
 
 
 
