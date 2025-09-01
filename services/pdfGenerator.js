@@ -605,55 +605,22 @@ async function generatePDF(orderData) {
 
 // Check if we're using corrected text directly
 if (orderData.directLetterContent) {
-  console.log('📝 Using corrected text directly');
-  console.log('📝 Raw text:', orderData.directLetterContent);
-  console.log('📝 Text includes \\n\\n:', orderData.directLetterContent.includes('\n\n'));
-  console.log('📝 Text includes \\n:', orderData.directLetterContent.includes('\n'));
+  console.log('📝 Using corrected letter template');
   
-  let fullText = orderData.directLetterContent;
-  let psContent = '';
-  
-  // Check for P.S. with different possible formats
-  const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
+  // Extract P.S. message from the corrected text
+  const psMatch = orderData.directLetterContent.match(/P\.S\.\s+(.+)$/);
   if (psMatch) {
-    psContent = psMatch[1];
-    fullText = fullText.substring(0, psMatch.index).trim();
-    orderData.psMessage = psContent;
-  }
-  
-  // If there are no double line breaks, create paragraphs based on sentence structure
-  let paragraphs;
-  if (fullText.includes('\n\n')) {
-    // Use existing paragraph breaks
-    paragraphs = fullText
-      .split('\n\n')
-      .filter(p => p.trim())
-      .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
-      .join('\n');
+    orderData.psMessage = psMatch[1];
+    // Remove P.S. from the main content
+    orderData.correctedLetter = orderData.directLetterContent.replace(/P\.S\.\s+.+$/, '').trim();
   } else {
-    // Create paragraphs manually - split after "Dear" greeting and other logical breaks
-    const lines = fullText.split('\n').filter(line => line.trim());
-    const formattedParagraphs = [];
-    let currentParagraph = [];
-    
-    lines.forEach(line => {
-      currentParagraph.push(line);
-      // Start new paragraph after greeting or if line ends with common endings
-      if (line.includes('My dearest') || line.includes('With all my love')) {
-        formattedParagraphs.push(`<p>${currentParagraph.join(' ')}</p>`);
-        currentParagraph = [];
-      }
-    });
-    
-    // Add any remaining lines
-    if (currentParagraph.length > 0) {
-      formattedParagraphs.push(`<p>${currentParagraph.join(' ')}</p>`);
-    }
-    
-    paragraphs = formattedParagraphs.join('\n');
+    orderData.correctedLetter = orderData.directLetterContent;
   }
   
-  letterContent = paragraphs;
+  // Use the corrected letter template
+  const templateFilename = 'corrected-letter.html';
+  const templateHtml = await fetchTemplate(templateFilename);
+  letterContent = processTemplateContent(templateHtml, orderData);
 } else {
   // Normal template processing
   const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
@@ -865,6 +832,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
