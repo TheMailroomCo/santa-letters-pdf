@@ -601,13 +601,36 @@ async function generatePDF(orderData) {
     // Load CSS with fonts embedded
     const styles = await loadCSS(griffithsBase64, lilyWangBase64);
 
-    // FETCH TEMPLATE FROM GITHUB
-    const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
-    console.log(`📄 Using template: ${templateFilename}`);
-    const templateHtml = await fetchTemplate(templateFilename);
-    
-    // Process template content with order data
-    const letterContent = processTemplateContent(templateHtml, orderData);
+    let letterContent;
+
+// Check if we're using corrected text directly
+if (orderData.directLetterContent) {
+  console.log('📝 Using corrected text directly');
+  
+  // Convert plain text to HTML paragraphs
+  const paragraphs = orderData.directLetterContent
+    .split('\n\n')
+    .filter(p => p.trim())
+    .map(p => {
+      // Check if it's the P.S. line
+      if (p.startsWith('P.S.')) {
+        // Extract P.S. for separate handling
+        orderData.psMessage = p.replace('P.S.', '').trim();
+        return ''; // Don't include in main content
+      }
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    })
+    .filter(p => p) // Remove empty strings
+    .join('\n');
+  
+  letterContent = paragraphs;
+} else {
+  // Normal template processing
+  const templateFilename = getTemplateFilename(orderData.template, orderData.letterYear, orderData.letterType);
+  console.log(`📄 Using template: ${templateFilename}`);
+  const templateHtml = await fetchTemplate(templateFilename);
+  letterContent = processTemplateContent(templateHtml, orderData);
+}
 
     // Determine font class
     const fontClass = orderData.font === 'Fancy' ? 'fancy-font' : 'block-font';
@@ -812,6 +835,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
