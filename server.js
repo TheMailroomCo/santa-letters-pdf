@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { generatePDF } = require('./services/pdfGenerator');
+const { generatePDF, getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
 const { generatePresentLabels } = require('./services/presentLabelGenerator');
 require('dotenv').config();
 
@@ -24,8 +24,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Replace your existing /test endpoint with this version that tests both fonts:
-
+// Test endpoint - tests both fonts
 app.get('/test', async (req, res) => {
   const testCases = [
     {
@@ -186,20 +185,20 @@ app.post('/generate-pdf', async (req, res) => {
     const result = await generatePDF(req.body);
     
     res.json({
-  success: true,
-  letter: {
-    filename: result.letter.filename,
-    url: `${req.protocol}://${req.get('host')}${result.letter.url}`
-  },
-  letterText: {
-    filename: result.letterText.filename,
-    url: `${req.protocol}://${req.get('host')}${result.letterText.url}`
-  },
-  envelope: {
-    filename: result.envelope.filename,
-    url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
-  }
-});
+      success: true,
+      letter: {
+        filename: result.letter.filename,
+        url: `${req.protocol}://${req.get('host')}${result.letter.url}`
+      },
+      letterText: {
+        filename: result.letterText.filename,
+        url: `${req.protocol}://${req.get('host')}${result.letterText.url}`
+      },
+      envelope: {
+        filename: result.envelope.filename,
+        url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
+      }
+    });
   } catch (error) {
     console.error('❌ Error:', error);
     res.status(500).json({
@@ -254,31 +253,7 @@ app.get('/test-labels', async (req, res) => {
   }
 });
 
-// Test endpoint for present labels
-app.get('/test-labels', async (req, res) => {
-  const testData = {
-    orderNumber: "TEST001",
-    childName: "Sophie"
-  };
-  
-  try {
-    const result = await generatePresentLabels(testData);
-    res.send(`
-      <h1>🎁 Present Labels Test</h1>
-      <p>Generated successfully!</p>
-      <p><a href="${result.url}" target="_blank">View PDF</a></p>
-      <p><a href="/">Back to Home</a></p>
-    `);
-  } catch (error) {
-    res.send(`
-      <h1>Error</h1>
-      <p>${error.message}</p>
-      <p><a href="/">Back to Home</a></p>
-    `);
-  }
-});
-
-// ADD THIS NEW TEST ROUTE HERE
+// Test merge template endpoint
 app.get('/test-merge', async (req, res) => {
   const testData = {
     orderNumber: "TEST001",
@@ -295,8 +270,6 @@ app.get('/test-merge', async (req, res) => {
   };
   
   try {
-    const { getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
-    
     // Get template filename
     const templateFilename = getTemplateFilename(
       testData.template, 
@@ -340,14 +313,10 @@ app.get('/test-merge', async (req, res) => {
   }
 });
 
-
 // NEW ENDPOINT: Merge template without generating PDF
 app.post('/merge-template', async (req, res) => {
   try {
     console.log('📝 Merging template for order:', req.body.orderNumber);
-    
-    // Import the functions we need from pdfGenerator
-    const { getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
     
     // Get template filename
     const templateFilename = getTemplateFilename(
@@ -390,7 +359,8 @@ app.post('/merge-template', async (req, res) => {
         template: req.body.template,
         font: req.body.font,
         orderNumber: req.body.orderNumber,
-        childName: req.body.childName
+        childName: req.body.childName,
+        customerNotes: req.body.customerNotes
       }
     });
     
@@ -407,7 +377,3 @@ app.post('/merge-template', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
-
-
-
-
