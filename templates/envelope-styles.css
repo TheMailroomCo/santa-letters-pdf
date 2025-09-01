@@ -63,29 +63,5 @@ body {
 
 }
 
-.envelope-name {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  font-size: 30pt;
-  line-height: 1.1;
-  padding: 0 20mm;
-  color: black;
-  letter-spacing: -0.5px;  /* Add negative letter-spacing to tighten gaps */
-  font-kerning: normal;    /* Enable proper kerning */
-  text-rendering: optimizeLegibility;  /* Better font rendering */
-}
 
-.envelope-address {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  font-size: 19pt;
-  line-height: 1.1;
-  padding: 0 15mm;
-  color: black;
-  letter-spacing: -0.3px;  /* Slightly less for smaller text */
-  font-kerning: normal;
-  text-rendering: optimizeLegibility;
-}
 
