@@ -177,7 +177,7 @@ Perth, Australia`,
   res.send(html);
 });
 
-// Webhook endpoint for Make.com
+// Original webhook endpoint for Make.com (unchanged for backward compatibility)
 app.post('/generate-pdf', async (req, res) => {
   try {
     console.log('📥 Received webhook:', JSON.stringify(req.body, null, 2));
@@ -208,7 +208,7 @@ app.post('/generate-pdf', async (req, res) => {
   }
 });
 
-// New endpoint for present labels
+// Endpoint for present labels
 app.post('/generate-present-labels', async (req, res) => {
   try {
     console.log('🎁 Received present labels webhook:', JSON.stringify(req.body, null, 2));
@@ -270,20 +270,15 @@ app.get('/test-merge', async (req, res) => {
   };
   
   try {
-    // Get template filename
     const templateFilename = getTemplateFilename(
       testData.template, 
       testData.letterYear, 
       testData.letterType
     );
     
-    // Fetch template from GitHub
     const templateHtml = await fetchTemplate(templateFilename);
-    
-    // Process template with data
     const mergedContent = processTemplateContent(templateHtml, testData);
     
-    // Convert HTML to plain text
     const plainText = mergedContent
       .replace(/<p>/g, '')
       .replace(/<\/p>/g, '\n\n')
@@ -313,13 +308,13 @@ app.get('/test-merge', async (req, res) => {
   }
 });
 
-// NEW ENDPOINT: Merge template without generating PDF
+// ENDPOINT: Merge template without generating PDF (for Claude review)
 app.post('/merge-template', async (req, res) => {
   try {
     console.log('📝 Merging template for order:', req.body.orderNumber);
     console.log('📦 Full request body:', JSON.stringify(req.body, null, 2));
     
-    // Validate required fields - letterType is always required
+    // Validate required fields
     if (!req.body.letterType) {
       console.error('❌ Missing required letterType');
       return res.status(400).json({
@@ -340,7 +335,7 @@ app.post('/merge-template', async (req, res) => {
     const templateHtml = await fetchTemplate(templateFilename);
     console.log('✅ Template fetched, length:', templateHtml.length);
     
-    // Process template with data (this returns HTML with variables replaced)
+    // Process template with data
     const mergedContent = processTemplateContent(templateHtml, req.body);
     
     // Convert HTML to plain text for Claude review
@@ -350,8 +345,8 @@ app.post('/merge-template', async (req, res) => {
       .replace(/<span[^>]*>/g, '')
       .replace(/<\/span>/g, '')
       .replace(/<br>/g, '\n')
-      .replace(/<[^>]*>/g, '') // Remove all other HTML tags
-      .replace(/\n{3,}/g, '\n\n') // Clean up excess line breaks
+      .replace(/<[^>]*>/g, '')
+      .replace(/\n{3,}/g, '\n\n')
       .trim();
     
     // Add P.S. if exists
@@ -360,7 +355,7 @@ app.post('/merge-template', async (req, res) => {
       fullLetter += `\n\nP.S. ${req.body.psMessage}`;
     }
     
-    // Also prepare envelope text for review
+    // Prepare envelope text for review
     const envelopeText = `${req.body.childName || req.body.familyNames || ''}\n${req.body.magicalAddress || ''}`;
     
     res.json({
@@ -372,7 +367,14 @@ app.post('/merge-template', async (req, res) => {
         font: req.body.font,
         orderNumber: req.body.orderNumber,
         childName: req.body.childName,
-        customerNotes: req.body.customerNotes
+        customerNotes: req.body.customerNotes,
+        letterType: req.body.letterType,
+        letterYear: req.body.letterYear,
+        envelopeColor: req.body.envelopeColor,
+        location: req.body.location,
+        achievement: req.body.achievement,
+        psMessage: req.body.psMessage,
+        magicalAddress: req.body.magicalAddress
       }
     });
     
@@ -385,128 +387,11 @@ app.post('/merge-template', async (req, res) => {
   }
 });
 
-// NEW ENDPOINT: Generate PDF from corrected text
-app.post('/generate-pdf-from-text', async (req, res) => {
-  try {
-    console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
-    
-    // Pass the corrected letter text directly to a special PDF generation
-    const result = await generatePDFFromText(
-      req.body.correctedLetter,
-      req.body.correctedEnvelope,
-      req.body.metadata
-    );
-    
-    res.json({
-      success: true,
-      letter: {
-        filename: result.letter.filename,
-        url: `${req.protocol}://${req.get('host')}${result.letter.url}`
-      },
-      envelope: {
-        filename: result.envelope.filename,
-        url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
-      }
-    });
-    
-  } catch (error) {
-    console.error('❌ PDF Generation from text error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-// New function to generate PDF from plain text
-async function generatePDFFromText(letterText, envelopeText, metadata) {
-  // This is a simplified version that will:
-  // 1. Convert the plain text back to HTML format
-  // 2. Generate the PDFs
-  
-  // For now, we'll use the regular generatePDF with reconstructed data
-  const orderData = {
-    ...metadata,
-    // We'll need to implement a way to convert plain text back to template format
-    // For now, pass through to regular PDF generator
-  };
-  
-  return generatePDF(orderData);
-}
-
-// NEW ENDPOINT: Generate PDF from corrected text
-app.post('/generate-pdf-from-corrected', async (req, res) => {
-  try {
-    console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
-    
-    // For corrected text, we bypass the normal template processing
-    // Instead, we'll generate directly from the corrected text
-    
-    // Split envelope into name and address
-    const envelopeLines = req.body.correctedEnvelope.split('\n');
-    const envelopeName = envelopeLines[0] || '';
-    const envelopeAddress = envelopeLines.slice(1).join('\n') || '';
-    
-    // Create a minimal order data structure
-    const orderData = {
-      orderNumber: req.body.orderNumber,
-      template: 'corrected', // Special template flag
-      font: req.body.font,
-      letterYear: req.body.letterYear,
-      envelopeColor: req.body.envelopeColor,
-      
-      // For envelope
-      childName: envelopeName,
-      magicalAddress: envelopeAddress,
-      
-      // For filename generation
-      letterName: envelopeName,
-      
-      // Pass the corrected letter as a special field
-      correctedLetterText: req.body.correctedLetter,
-      
-      // Flag to indicate we're using corrected text
-      useCorrectedText: true
-    };
-    
-    // Generate PDF with the corrected data
-    const result = await generatePDF(orderData);
-    
-    res.json({
-      success: true,
-      letter: {
-        filename: result.letter.filename,
-        url: `${req.protocol}://${req.get('host')}${result.letter.url}`
-      },
-      envelope: {
-        filename: result.envelope.filename,
-        url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
-      },
-      text: {
-        filename: result.letterText.filename,
-        url: `${req.protocol}://${req.get('host')}${result.letterText.url}`
-      }
-    });
-    
-  } catch (error) {
-    console.error('❌ PDF Generation from corrected text error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-// Helper function to extract P.S. message from corrected letter
-function extractPSMessage(letterText) {
-  const psMatch = letterText.match(/P\.S\.\s+(.+)$/);
-  return psMatch ? psMatch[1] : '';
-}
-
-// Generate PDF directly from corrected text
+// MAIN ENDPOINT: Generate PDF from corrected text (this is what Make.com should call after Claude)
 app.post('/generate-pdf-direct', async (req, res) => {
   try {
     console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
+    console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
     
     // Build order data with corrected envelope fields mapped properly
     const orderData = {
@@ -528,6 +413,7 @@ app.post('/generate-pdf-direct', async (req, res) => {
     
     console.log('🏷️  Using envelope name:', orderData.childName);
     console.log('🏠 Using envelope address:', orderData.magicalAddress);
+    console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
     
     // Generate using existing function
     const result = await generatePDF(orderData);
@@ -538,6 +424,10 @@ app.post('/generate-pdf-direct', async (req, res) => {
         filename: result.letter.filename,
         url: `${req.protocol}://${req.get('host')}${result.letter.url}`
       },
+      letterText: {
+        filename: result.letterText.filename,
+        url: `${req.protocol}://${req.get('host')}${result.letterText.url}`
+      },
       envelope: {
         filename: result.envelope.filename,
         url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
@@ -545,7 +435,7 @@ app.post('/generate-pdf-direct', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('❌ Error generating PDF from corrected text:', error);
     res.status(500).json({
       success: false,
       error: error.message
@@ -553,8 +443,24 @@ app.post('/generate-pdf-direct', async (req, res) => {
   }
 });
 
+// DEPRECATED ENDPOINTS (kept for backward compatibility but cleaned up)
+app.post('/generate-pdf-from-text', async (req, res) => {
+  console.log('⚠️  DEPRECATED: /generate-pdf-from-text endpoint called. Use /generate-pdf-direct instead.');
+  res.status(410).json({
+    success: false,
+    error: 'This endpoint is deprecated. Use /generate-pdf-direct instead.'
+  });
+});
+
+app.post('/generate-pdf-from-corrected', async (req, res) => {
+  console.log('⚠️  DEPRECATED: /generate-pdf-from-corrected endpoint called. Use /generate-pdf-direct instead.');
+  res.status(410).json({
+    success: false,
+    error: 'This endpoint is deprecated. Use /generate-pdf-direct instead.'
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
-
