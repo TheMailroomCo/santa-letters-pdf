@@ -508,7 +508,7 @@ app.post('/generate-pdf-direct', async (req, res) => {
   try {
     console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
     
-    // Build minimal order data - now with separated envelope fields
+    // Build order data with corrected envelope fields mapped properly
     const orderData = {
       orderNumber: req.body.orderNumber,
       template: req.body.template,
@@ -517,21 +517,17 @@ app.post('/generate-pdf-direct', async (req, res) => {
       envelopeColor: req.body.envelopeColor,
       letterType: req.body.letterType,
       
-      // Use the separated envelope fields
-      childName: req.body.correctedEnvelopeName || req.body.childName,
-      letterName: req.body.letterName || req.body.correctedEnvelopeName,
+      // Map corrected envelope fields to what generateEnvelope expects
+      childName: req.body.correctedEnvelopeName || req.body.childName || '',
+      letterName: req.body.correctedEnvelopeName || req.body.letterName || req.body.childName || '',
+      magicalAddress: req.body.correctedEnvelopeAddress || req.body.magicalAddress || '',
       
-      // Combine name and address for the full envelope text
-      magicalAddress: req.body.correctedEnvelopeAddress || '',
-      
-      // These can be empty - we're using corrected text
-      location: '',
-      achievement: '',
-      psMessage: '',
-      
-      // Pass the corrected letter directly
+      // Pass the corrected letter content
       directLetterContent: req.body.correctedLetter
     };
+    
+    console.log('🏷️  Using envelope name:', orderData.childName);
+    console.log('🏠 Using envelope address:', orderData.magicalAddress);
     
     // Generate using existing function
     const result = await generatePDF(orderData);
@@ -561,3 +557,4 @@ app.post('/generate-pdf-direct', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
