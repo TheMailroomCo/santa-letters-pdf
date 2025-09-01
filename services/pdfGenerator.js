@@ -195,32 +195,33 @@ function processTemplateContent(templateHtml, orderData) {
     }
   }
   
-  // Map of placeholders to data fields
-  const placeholderMap = {
-    '{name}': orderData.childName || orderData.letterName || '',
-    '{childName}': orderData.childName || '',
-    '{letterName}': orderData.letterName || '',
-    '{achievement}': orderData.achievement || '',
-    '{location}': orderData.location || '',
-    '{magicalAddress}': orderData.magicalAddress || '',
-    '{psMessage}': orderData.psMessage || '',
-    '{familyAchievement}': orderData.familyAchievement || '',
-    '{actOfKindness}': orderData.actOfKindness || '',
-    '{familyNames}': orderData.familyNames || '',
-    '{childrenNames}': orderData.childrenNames || '',
-    '{familyLastName}': orderData.familyLastName || '',
-    '{parentsNames}': orderData.parentsNames || '',
-    '{parentPronouns}': orderData.parentPronouns || '',
-    '{numberOfChristmases}': orderData.numberOfChristmases || '',
-    '{characteristics}': orderData.characteristics || '',
-    '{letterYear}': orderData.letterYear || '2025',
-    '{font}': orderData.font || '',
-    '{envelopeColor}': orderData.envelopeColor || '',
-    '{pronoun_They}': pronouns.they,
-    '{pronoun_their}': pronouns.their,
-    '{pronoun_Their}': pronouns.Their,
-    '{correctedLetter}': orderData.correctedLetter || ''
-  };
+// Map of placeholders to data fields
+const placeholderMap = {
+  '{name}': orderData.childName || orderData.letterName || '',
+  '{childName}': orderData.childName || '',
+  '{letterName}': orderData.letterName || '',
+  '{achievement}': orderData.achievement || '',
+  '{location}': orderData.location || '',
+  '{magicalAddress}': orderData.magicalAddress || '',
+  '{psMessage}': orderData.psMessage || '',
+  '{familyAchievement}': orderData.familyAchievement || '',
+  '{actOfKindness}': orderData.actOfKindness || '',
+  '{familyNames}': orderData.familyNames || '',
+  '{childrenNames}': orderData.childrenNames || '',
+  '{familyLastName}': orderData.familyLastName || '',
+  '{parentsNames}': orderData.parentsNames || '',
+  '{parentPronouns}': orderData.parentPronouns || '',
+  '{numberOfChristmases}': orderData.numberOfChristmases || '',
+  '{characteristics}': orderData.characteristics || '',
+  '{letterYear}': orderData.letterYear || '2025',
+  '{font}': orderData.font || '',
+  '{envelopeColor}': orderData.envelopeColor || '',
+  '{pronoun_They}': pronouns.they,
+  '{pronoun_their}': pronouns.their,
+  '{pronoun_Their}': pronouns.Their,
+  '{correctedLetter}': orderData.correctedLetter || '',  // <- Added comma here
+  '{yourLetter}': orderData.yourLetter || ''
+};
   
   // Replace all placeholders
   Object.entries(placeholderMap).forEach(([placeholder, value]) => {
@@ -772,3 +773,4 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
