@@ -508,10 +508,7 @@ app.post('/generate-pdf-direct', async (req, res) => {
   try {
     console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
     
-    // Parse envelope
-    const envelopeLines = req.body.correctedEnvelope.split('\n');
-    
-    // Build minimal order data
+    // Build minimal order data - now with separated envelope fields
     const orderData = {
       orderNumber: req.body.orderNumber,
       template: req.body.template,
@@ -519,16 +516,20 @@ app.post('/generate-pdf-direct', async (req, res) => {
       letterYear: req.body.letterYear,
       envelopeColor: req.body.envelopeColor,
       letterType: req.body.letterType,
-      childName: envelopeLines[0] || req.body.childName,
-      letterName: req.body.letterName,
-      magicalAddress: req.body.correctedEnvelope,
+      
+      // Use the separated envelope fields
+      childName: req.body.correctedEnvelopeName || req.body.childName,
+      letterName: req.body.letterName || req.body.correctedEnvelopeName,
+      
+      // Combine name and address for the full envelope text
+      magicalAddress: req.body.correctedEnvelopeAddress || '',
       
       // These can be empty - we're using corrected text
       location: '',
       achievement: '',
       psMessage: '',
       
-      // Pass the corrected text directly
+      // Pass the corrected letter directly
       directLetterContent: req.body.correctedLetter
     };
     
