@@ -250,7 +250,8 @@ function processTemplateContent(templateHtml, orderData) {
     '{envelopeColor}': orderData.envelopeColor || '',  // No default - should come from Shopify (Red or Green)
     '{pronoun_They}': pronouns.they,
     '{pronoun_their}': pronouns.their,
-    '{pronoun_Their}': pronouns.Their
+    '{pronoun_Their}': pronouns.Their,
+    '{correctedLetter}': orderData.correctedLetter || ''
   };
   
   // Replace all placeholders
@@ -832,6 +833,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
