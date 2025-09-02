@@ -11,6 +11,12 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+.block-font-bold {
+  font-family: 'Griffiths', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
 body {
   width: 180mm;
   height: 240mm;
@@ -129,4 +135,5 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
+
 
