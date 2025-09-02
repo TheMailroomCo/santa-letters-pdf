@@ -51,7 +51,7 @@ body {
   font-family: 'Griffiths', Georgia, serif !important;
   font-size: 16pt; /* Smaller for block font */
   letter-spacing: 1pt; /* Add spacing between characters */
-  font-weight: 500 !important; /* Subtle weight increase */
+  font-weight: 700 !important; /* Subtle weight increase */
 }
 /* Letter content area with exact boundaries */
 .letter-content {
@@ -73,7 +73,7 @@ body {
 .block-font .date-display,
 .block-font p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 500 !important; /* Subtle weight increase for all block font text */
+  font-weight: 700 !important; /* Subtle weight increase for all block font text */
 }
 .fancy-font .date-display,
 .fancy-font p {
@@ -89,7 +89,7 @@ body {
 .block-font .letter-content p,
 .block-font .ps-message p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 500 !important; /* Subtle weight increase */
+  font-weight: 700 !important; /* Subtle weight increase */
 }
 .letter-content p:first-child {
   margin-bottom: 10pt;
@@ -129,3 +129,4 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
+
