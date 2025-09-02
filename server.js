@@ -446,8 +446,11 @@ app.post('/generate-pdf-direct', async (req, res) => {
       letterName: cleanEnvelopeName,
       magicalAddress: cleanEnvelopeAddress,
       
-      // Pass the corrected letter content
-      directLetterContent: req.body.correctedLetter
+      // Pass the corrected letter content - clean up escaped characters
+      directLetterContent: (req.body.correctedLetter || '')
+        .replace(/\\\*/g, '*')     // Convert \* to *
+        .replace(/\\\"/g, '"')     // Convert \" to "
+        .replace(/\\\'/g, "'")     // Convert \' to '
     };
     
     console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
