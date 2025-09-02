@@ -71,7 +71,7 @@ body {
 .block-font .date-display,
 .block-font p {
   font-family: 'Griffiths', Georgia, serif;
-  font-weight: 600; /* Slightly bolder to compensate for removed stroke */
+  font-weight: 400; /* Slightly bolder to compensate for removed stroke */
   letter-spacing: 0.2pt; /* Slight letter spacing for better readability */
 }
 .fancy-font .date-display,
@@ -123,3 +123,4 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
+
