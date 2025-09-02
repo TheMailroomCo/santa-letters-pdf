@@ -2,18 +2,15 @@
   font-family: 'Griffiths';
   src: url('GRIFFITHS_BASE64') format('truetype');
 }
-
 @font-face {
   font-family: 'LilyWang';  
   src: url('LILYWANG_BASE64') format('opentype');
 }
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   width: 180mm;
   height: 240mm;
@@ -22,7 +19,6 @@ body {
   position: relative;
   background-color: white;
 }
-
 .background-image {
   position: absolute;
   top: 0;
@@ -31,7 +27,6 @@ body {
   height: 240mm;
   z-index: 1;
 }
-
 .letter-container {
   position: absolute;
   top: 0;
@@ -51,13 +46,11 @@ body {
   font-size: 18pt;
   z-index: 3;
 }
-
 /* Block font specific date styling */
 .block-font .date-display {
   font-size: 16pt; /* Smaller for block font */
   letter-spacing: 1pt; /* Add spacing between characters */
 }
-
 /* Letter content area with exact boundaries */
 .letter-content {
   position: absolute;
@@ -68,46 +61,38 @@ body {
   overflow: hidden;
   padding: 2mm;
 }
-
 /* Font families */
 .block-font {
   font-family: 'Griffiths', Georgia, serif;
 }
-
 .fancy-font {
   font-family: 'LilyWang', cursive;
 }
-
 .block-font .date-display,
 .block-font p {
   font-family: 'Griffiths', Georgia, serif;
-  -webkit-text-stroke: 0.142pt #000000;
-  text-stroke: 0.142pt #000000;
+  font-weight: 600; /* Slightly bolder to compensate for removed stroke */
+  letter-spacing: 0.2pt; /* Slight letter spacing for better readability */
 }
-
 .fancy-font .date-display,
 .fancy-font p {
   font-family: 'LilyWang', cursive;
 }
-
 /* Paragraph styling */
 .letter-content p {
   margin-bottom: 10pt;
   text-align: justify;
   text-justify: inter-word;
 }
-
 /* Special styling for first line (salutation) */
 .letter-content p:first-child {
   margin-bottom: 10pt;
   margin-top: 0;
 }
-
 /* Remove bottom margin on last paragraph */
 .letter-content p:last-child {
   margin-bottom: 0;
 }
-
 /* P.S. message positioned below Santa signature */
 .ps-message {
   position: absolute;
@@ -123,27 +108,18 @@ body {
   flex-direction: column;
   justify-content: center;
 }
-
 /* Inner wrapper for P.S. measurement */
 .ps-message-inner {
   /* No additional styling needed - just for measurement */
 }
-
 .ps-message p {
   margin: 0;
 }
-
 /* Remove bold from P.S. */
 .ps-message strong {
   font-weight: normal;
 }
-
 /* Remove highlighting for personalized text */
 .personalized-text {
   /* No styling - just plain text */
-
 }
-
-
-
-
