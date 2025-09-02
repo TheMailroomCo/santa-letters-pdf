@@ -300,8 +300,7 @@ function getDynamicSizingScript() {
           p.style.fontSize = mid + 'pt';
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           if (isBlockFont) {
-            p.style.fontFamily = 'Griffiths, Georgia, serif';
-            p.style.fontWeight = '700';  // Using bold for more visible effect
+p.classList.add('block-font-bold');
           } else if (isFancy) {
             p.style.fontFamily = 'LilyWang, cursive';
           }
@@ -326,8 +325,7 @@ function getDynamicSizingScript() {
         p.style.fontSize = bestFit + 'pt';
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         if (isBlockFont) {
-          p.style.fontFamily = 'Griffiths, Georgia, serif';
-          p.style.fontWeight = '700';  // Using bold for more visible effect
+p.classList.add('block-font-bold');
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
@@ -837,6 +835,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
