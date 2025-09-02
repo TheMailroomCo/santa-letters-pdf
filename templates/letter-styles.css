@@ -43,7 +43,7 @@ body {
 /* Block font bold class - used by JavaScript */
 .block-font-bold {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 700 !important;
+  font-weight: 500 !important;
 }
 
 /* ========================
@@ -174,3 +174,4 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
+
