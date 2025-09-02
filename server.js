@@ -388,12 +388,51 @@ app.post('/merge-template', async (req, res) => {
 });
 
 // MAIN ENDPOINT: Generate PDF from corrected text (this is what Make.com should call after Claude)
+// UPDATED WITH CLEANING LOGIC FOR ENVELOPE DATA
 app.post('/generate-pdf-direct', async (req, res) => {
   try {
     console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
     console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
     
-    // Build order data with corrected envelope fields mapped properly
+    // Helper function to clean envelope text
+    function cleanEnvelopeText(text) {
+      if (!text) return '';
+      
+      // Remove common artifacts from Make.com/Claude parsing
+      let cleaned = text
+        .replace(/[\[\]{}'"]/g, '')  // Remove brackets, braces, quotes
+        .replace(/\\"/g, '')          // Remove escaped quotes
+        .replace(/\\/g, '')           // Remove backslashes (will re-add for \n)
+        .replace(/\\n/g, '\n')        // Re-add newlines
+        .replace(/^\W+/, '')          // Remove non-word chars from start
+        .replace(/\W+$/, '')          // Remove non-word chars from end (except \n)
+        .trim();
+      
+      // Preserve newlines but remove trailing punctuation after the last line
+      const lines = cleaned.split('\n');
+      if (lines.length > 0) {
+        // Clean the last line specifically
+        lines[lines.length - 1] = lines[lines.length - 1].replace(/[^\w\s]+$/, '').trim();
+      }
+      
+      return lines.join('\n');
+    }
+    
+    // Clean the envelope data to remove rogue characters
+    const cleanEnvelopeName = cleanEnvelopeText(
+      req.body.correctedEnvelopeName || req.body.childName || ''
+    );
+    
+    const cleanEnvelopeAddress = cleanEnvelopeText(
+      req.body.correctedEnvelopeAddress || req.body.magicalAddress || ''
+    );
+    
+    console.log('🧹 Original envelope name:', req.body.correctedEnvelopeName || req.body.childName);
+    console.log('🏷️ Cleaned envelope name:', cleanEnvelopeName);
+    console.log('🧹 Original envelope address:', req.body.correctedEnvelopeAddress || req.body.magicalAddress);
+    console.log('🏠 Cleaned envelope address:', cleanEnvelopeAddress);
+    
+    // Build order data with cleaned envelope fields
     const orderData = {
       orderNumber: req.body.orderNumber,
       template: req.body.template,
@@ -402,17 +441,15 @@ app.post('/generate-pdf-direct', async (req, res) => {
       envelopeColor: req.body.envelopeColor,
       letterType: req.body.letterType,
       
-      // Map corrected envelope fields to what generateEnvelope expects
-      childName: req.body.correctedEnvelopeName || req.body.childName || '',
-      letterName: req.body.correctedEnvelopeName || req.body.letterName || req.body.childName || '',
-      magicalAddress: req.body.correctedEnvelopeAddress || req.body.magicalAddress || '',
+      // Use cleaned envelope data
+      childName: cleanEnvelopeName,
+      letterName: cleanEnvelopeName,
+      magicalAddress: cleanEnvelopeAddress,
       
       // Pass the corrected letter content
       directLetterContent: req.body.correctedLetter
     };
     
-    console.log('🏷️  Using envelope name:', orderData.childName);
-    console.log('🏠 Using envelope address:', orderData.magicalAddress);
     console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
     
     // Generate using existing function
