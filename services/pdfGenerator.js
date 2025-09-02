@@ -377,10 +377,10 @@ async function loadEnvelopeCSS(lilyWangBase64) {
   }
 }
 
-// Script to handle dynamic centering of envelope text
+// Script to handle dynamic centering of envelope text - FIXED VERSION
 function getEnvelopeScript() {
   return `
-    // Center text vertically while keeping improved positioning logic
+    // Center text vertically while keeping different font sizes
     setTimeout(() => {
       const nameElement = document.querySelector('.envelope-name');
       const addressElement = document.querySelector('.envelope-address');
@@ -412,16 +412,15 @@ function getEnvelopeScript() {
         } else if (nameText.length > 50) {
           nameFontSize = 29;
         }
-        // Under 50 characters uses 30pt (the CSS default)
         
         // Apply the calculated font size to NAME only
         nameElement.style.fontSize = nameFontSize + 'pt';
         
-        // Keep address at CSS-defined size (19pt) - don't override
-        addressElement.style.fontSize = '19pt';
+        // DO NOT override address font size - let CSS handle it (19pt)
+        // REMOVED: addressElement.style.fontSize = '19pt';
         
         console.log('📏 Using name font size:', nameFontSize + 'pt');
-        console.log('📏 Using address font size: 19pt (CSS default)');
+        console.log('📏 Address uses CSS default: 19pt');
         
         // Force reflow to get accurate measurements after font size change
         nameElement.offsetHeight;
@@ -506,10 +505,6 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   <style>${css}</style>
 </head>
 <body>
-  <!-- TEST: CSS font sizes -->
-  <div style="position: absolute; top: 10mm; left: 10mm; font-size: 30pt; font-family: 'LilyWang', cursive; color: red;">TEST NAME SIZE</div>
-  <div style="position: absolute; top: 25mm; left: 10mm; font-size: 19pt; font-family: 'LilyWang', cursive; color: blue;">TEST ADDRESS SIZE</div>
-  
   <div class="envelope-container">
     <div class="envelope-name">
       ${formattedEnvelopeName}
