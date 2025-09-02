@@ -4,6 +4,14 @@
 @font-face {
   font-family: 'Griffiths';
   src: url('GRIFFITHS_BASE64') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Griffiths';
+  src: url('GRIFFITHS_BOLD_BASE64') format('truetype');
+  font-weight: bold;
+  font-weight: 600 700 800 900;  /* Bold weights */
 }
 
 @font-face {
@@ -43,7 +51,7 @@ body {
 /* Block font bold class - used by JavaScript */
 .block-font-bold {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: bold !important;  /* Will use the bold font file */
 }
 
 /* ========================
@@ -85,7 +93,7 @@ body {
   font-family: 'Griffiths', Georgia, serif !important;
   font-size: 16pt;
   letter-spacing: 1pt;
-  font-weight: 600 !important;
+  font-weight: bold !important;  /* Will use the bold font file */
 }
 
 /* Fancy font date styling */
@@ -125,7 +133,7 @@ body {
 /* Block font paragraph styling */
 .block-font p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: bold !important;  /* Will use the bold font file */
 }
 
 /* Fancy font paragraph styling */
@@ -165,7 +173,7 @@ body {
 /* Block font P.S. styling */
 .block-font .ps-message p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: bold !important;  /* Will use the bold font file */
 }
 
 /* ========================
