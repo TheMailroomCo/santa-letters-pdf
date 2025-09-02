@@ -300,7 +300,7 @@ function getDynamicSizingScript() {
           p.style.fontSize = mid + 'pt';
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           if (isBlockFont) {
-p.classList.add('block-font-bold');
+            p.classList.add('block-font-bold');
           } else if (isFancy) {
             p.style.fontFamily = 'LilyWang, cursive';
           }
@@ -325,7 +325,7 @@ p.classList.add('block-font-bold');
         p.style.fontSize = bestFit + 'pt';
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         if (isBlockFont) {
-p.classList.add('block-font-bold');
+          p.classList.add('block-font-bold');
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
@@ -341,8 +341,7 @@ p.classList.add('block-font-bold');
           psText.style.lineHeight = '1.05';
           
           if (isBlockFont) {
-            psText.style.fontFamily = 'Griffiths, Georgia, serif';
-            psText.style.fontWeight = '700';  // Using bold for more visible effect
+            psText.classList.add('block-font-bold');
           } else if (isFancy) {
             psText.style.fontFamily = 'LilyWang, cursive';
           }
@@ -374,17 +373,16 @@ p.classList.add('block-font-bold');
       if (isBlockFont) {
         const dateDisplay = document.querySelector('.date-display');
         if (dateDisplay) {
-          dateDisplay.style.fontWeight = '700';  // Using bold for more visible effect
-          console.log('Date font-weight applied:', dateDisplay.style.fontWeight);
+          dateDisplay.classList.add('block-font-bold');
+          console.log('Date class applied:', dateDisplay.className);
         }
       }
       
-      // Debug: Check if font-weight is applied to paragraphs
+      // Debug: Check if class is applied to paragraphs
       if (isBlockFont) {
         const firstParagraph = container.querySelector('p');
         if (firstParagraph) {
-          console.log('Paragraph font-weight:', firstParagraph.style.fontWeight);
-          console.log('Paragraph font-family:', firstParagraph.style.fontFamily);
+          console.log('Paragraph classes:', firstParagraph.className);
         }
       }
     }, 500);
@@ -835,7 +833,3 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
-
-
-
-
