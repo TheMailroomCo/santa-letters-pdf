@@ -301,7 +301,7 @@ function getDynamicSizingScript() {
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           if (isBlockFont) {
             p.style.fontFamily = 'Griffiths, Georgia, serif';
-
+            p.style.fontWeight = '500';  // Added font-weight
           } else if (isFancy) {
             p.style.fontFamily = 'LilyWang, cursive';
           }
@@ -327,6 +327,7 @@ function getDynamicSizingScript() {
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
+          p.style.fontWeight = '500';  // Added font-weight
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
@@ -343,6 +344,7 @@ function getDynamicSizingScript() {
           
           if (isBlockFont) {
             psText.style.fontFamily = 'Griffiths, Georgia, serif';
+            psText.style.fontWeight = '500';  // Added font-weight
           } else if (isFancy) {
             psText.style.fontFamily = 'LilyWang, cursive';
           }
@@ -368,6 +370,12 @@ function getDynamicSizingScript() {
             }
           }, 50);
         }
+      }
+      
+      // Handle date display font-weight
+      const dateDisplay = document.querySelector('.block-font .date-display');
+      if (dateDisplay) {
+        dateDisplay.style.fontWeight = '500';
       }
     }, 500);
   `;
@@ -817,4 +825,5 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
