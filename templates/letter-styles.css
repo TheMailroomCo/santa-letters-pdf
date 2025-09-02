@@ -1,20 +1,23 @@
+/* ========================
+   FONT DEFINITIONS
+   ======================== */
 @font-face {
   font-family: 'Griffiths';
   src: url('GRIFFITHS_BASE64') format('truetype');
 }
+
 @font-face {
   font-family: 'LilyWang';  
   src: url('LILYWANG_BASE64') format('opentype');
 }
+
+/* ========================
+   GLOBAL STYLES
+   ======================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-.block-font-bold {
-  font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 500 !important;
 }
 
 body {
@@ -25,6 +28,27 @@ body {
   position: relative;
   background-color: white;
 }
+
+/* ========================
+   FONT CLASSES
+   ======================== */
+.block-font {
+  font-family: 'Griffiths', Georgia, serif;
+}
+
+.fancy-font {
+  font-family: 'LilyWang', cursive;
+}
+
+/* Block font bold class - used by JavaScript */
+.block-font-bold {
+  font-family: 'Griffiths', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+/* ========================
+   LAYOUT CONTAINERS
+   ======================== */
 .background-image {
   position: absolute;
   top: 0;
@@ -33,6 +57,7 @@ body {
   height: 240mm;
   z-index: 1;
 }
+
 .letter-container {
   position: absolute;
   top: 0;
@@ -40,72 +65,77 @@ body {
   width: 100%;
   height: 100%;
   z-index: 2;
-  /* Remove padding - we'll position children absolutely */
 }
-/* Date display */
+
+/* ========================
+   DATE DISPLAY
+   ======================== */
 .date-display {
   position: absolute;
-  top: 40mm;  /* Adjust this to move date up/down (reduce to move up) */
+  top: 40mm;
   left: 16mm;
   right: 16mm;
   text-align: right;
   font-size: 18pt;
   z-index: 3;
 }
+
 /* Block font specific date styling */
 .block-font .date-display {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-size: 16pt; /* Smaller for block font */
-  letter-spacing: 1pt; /* Add spacing between characters */
-  font-weight: 700 !important; /* Subtle weight increase */
+  font-size: 16pt;
+  letter-spacing: 1pt;
+  font-weight: 700 !important;
 }
-/* Letter content area with exact boundaries */
+
+/* Fancy font date styling */
+.fancy-font .date-display {
+  font-family: 'LilyWang', cursive;
+}
+
+/* ========================
+   LETTER CONTENT
+   ======================== */
 .letter-content {
   position: absolute;
-  top: 50mm;  /* Adjust this independently of date */
+  top: 50mm;
   left: 16mm;
   right: 16mm;
   height: 152mm;
   overflow: hidden;
   padding: 2mm;
 }
-/* Font families */
-.block-font {
-  font-family: 'Griffiths', Georgia, serif;
-}
-.fancy-font {
-  font-family: 'LilyWang', cursive;
-}
-.block-font .date-display,
-.block-font p {
-  font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 700 !important; /* Subtle weight increase for all block font text */
-}
-.fancy-font .date-display,
-.fancy-font p {
-  font-family: 'LilyWang', cursive;
-}
+
 /* Paragraph styling */
 .letter-content p {
   margin-bottom: 10pt;
   text-align: justify;
   text-justify: inter-word;
 }
-/* Additional specific targeting for Block font paragraphs */
-.block-font .letter-content p,
-.block-font .ps-message p {
-  font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 700 !important; /* Subtle weight increase */
-}
+
 .letter-content p:first-child {
   margin-bottom: 10pt;
   margin-top: 0;
 }
-/* Remove bottom margin on last paragraph */
+
 .letter-content p:last-child {
   margin-bottom: 0;
 }
-/* P.S. message positioned below Santa signature */
+
+/* Block font paragraph styling */
+.block-font p {
+  font-family: 'Griffiths', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+/* Fancy font paragraph styling */
+.fancy-font p {
+  font-family: 'LilyWang', cursive;
+}
+
+/* ========================
+   P.S. MESSAGE
+   ======================== */
 .ps-message {
   position: absolute;
   bottom: 11mm;
@@ -114,27 +144,33 @@ body {
   height: 16mm;
   overflow: hidden;
   padding: 2mm;
-  
-  /* Keep vertical centering for P.S. */
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-/* Inner wrapper for P.S. measurement */
+
 .ps-message-inner {
-  /* No additional styling needed - just for measurement */
+  /* Container for P.S. measurement */
 }
+
 .ps-message p {
   margin: 0;
 }
-/* Remove bold from P.S. */
+
+/* Remove bold from P.S. strong tag */
 .ps-message strong {
   font-weight: normal;
 }
-/* Remove highlighting for personalized text */
+
+/* Block font P.S. styling */
+.block-font .ps-message p {
+  font-family: 'Griffiths', Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+/* ========================
+   UTILITY CLASSES
+   ======================== */
 .personalized-text {
   /* No styling - just plain text */
 }
-
-
-
