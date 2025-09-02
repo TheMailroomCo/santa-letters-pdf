@@ -236,7 +236,7 @@ function processTemplateContent(templateHtml, orderData) {
     '{pronoun_their}': pronouns.their,
     '{pronoun_Their}': pronouns.Their,
     '{correctedLetter}': orderData.correctedLetter || '',
-    '{yourLetter}': orderData.yourLetter || ''
+    '{yourLetter}': orderData.yourLetter || orderData['Your Letter'] || ''
   };
   
   // Replace all placeholders
@@ -478,40 +478,64 @@ async function generateEnvelope(orderData, lilyWangBase64) {
   console.log('CSS contains .envelope-address font-size:', css.includes('envelope-address') && css.includes('19pt'));
   console.log('CSS length:', css.length);
   
-  const envelopeName = orderData.childName || orderData.familyNames || '';
+  // Check if we have a combined envelope field or separate fields
+  let envelopeName = '';
+  let magicalAddress = '';
+  
+  // If childName contains \n, it's likely a combined field that needs splitting
+  if (orderData.childName && orderData.childName.includes('\\n')) {
+    console.log('📦 Detected combined envelope field, splitting...');
+    const combined = orderData.childName.replace(/\\n/g, '\n');
+    const lines = combined.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    if (lines.length > 0) {
+      // First line is the name
+      envelopeName = lines[0];
+      // Rest is the address
+      magicalAddress = lines.slice(1).join('\n');
+    }
+    
+    console.log('📝 Split name:', envelopeName);
+    console.log('🏠 Split address:', magicalAddress);
+  } else {
+    // Use separate fields as normal
+    envelopeName = orderData.childName || orderData.familyNames || '';
+    magicalAddress = orderData.magicalAddress || '';
+    
+    // Handle literal \n characters
+    envelopeName = envelopeName.replace(/\\n/g, '\n');
+    magicalAddress = magicalAddress.replace(/\\n/g, '\n');
+  }
 
-  // Handle literal \n characters AND actual newlines
+  // Format name for HTML
   const formattedEnvelopeName = envelopeName
-    .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines first
     .split('\n')
     .map(line => line.trim())
     .filter(line => line.length > 0)
     .join('<br>');
     
-  console.log('📝 Name for envelope:', envelopeName.replace(/\n/g, ' | '));
-  console.log('📝 Formatted for HTML:', formattedEnvelopeName);
+  console.log('📝 Formatted name for HTML:', formattedEnvelopeName);
   
-  let magicalAddress = orderData.magicalAddress || '';
-  
-  // Handle literal \n characters first
-  magicalAddress = magicalAddress.replace(/\\n/g, '\n');
-
+  // Format address for HTML
+  let formattedAddress = '';
   if (magicalAddress.includes('\n')) {
-    magicalAddress = magicalAddress
+    formattedAddress = magicalAddress
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0)
       .join('<br>');
   } 
   else if (magicalAddress.includes('|')) {
-    magicalAddress = magicalAddress
+    formattedAddress = magicalAddress
       .split('|')
       .map(line => line.trim())
       .filter(line => line.length > 0)
       .join('<br>');
+  } else {
+    formattedAddress = magicalAddress;
   }
   
-  console.log('🏠 Processed magical address:', magicalAddress);
+  console.log('🏠 Formatted address for HTML:', formattedAddress);
   
   const html = `
 <!DOCTYPE html>
@@ -527,7 +551,7 @@ async function generateEnvelope(orderData, lilyWangBase64) {
     </div>
     
     <div class="envelope-address">
-      ${magicalAddress}
+      ${formattedAddress}
     </div>
   </div>
   
@@ -577,9 +601,14 @@ async function generatePDF(orderData) {
       
       let fullText = orderData.directLetterContent;
       
-      // Handle literal \n characters
-      fullText = fullText.replace(/\\n/g, '\n');
-      console.log('📝 After converting literal \\n:', fullText);
+      // Handle literal \n characters and remove escaped asterisks
+      fullText = fullText
+        .replace(/\\n/g, '\n')
+        .replace(/\\\*/g, '*')     // Convert \* to *
+        .replace(/\\\"/g, '"')     // Convert \" to "
+        .replace(/\\\'/g, "'");    // Convert \' to '
+        
+      console.log('📝 After cleaning escaped characters:', fullText);
       
       // Extract P.S. message
       const psMatch = fullText.match(/P\.S\.\s+(.+)$/m);
