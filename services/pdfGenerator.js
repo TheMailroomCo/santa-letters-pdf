@@ -301,8 +301,7 @@ function getDynamicSizingScript() {
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           if (isBlockFont) {
             p.style.fontFamily = 'Griffiths, Georgia, serif';
-            p.style.webkitTextStroke = '0.142pt #000000';
-            p.style.textStroke = '0.142pt #000000';
+
           } else if (isFancy) {
             p.style.fontFamily = 'LilyWang, cursive';
           }
@@ -328,8 +327,6 @@ function getDynamicSizingScript() {
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
-          p.style.webkitTextStroke = '0.142pt #000000';
-          p.style.textStroke = '0.142pt #000000';
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
@@ -346,8 +343,6 @@ function getDynamicSizingScript() {
           
           if (isBlockFont) {
             psText.style.fontFamily = 'Griffiths, Georgia, serif';
-            psText.style.webkitTextStroke = '0.142pt #000000';
-            psText.style.textStroke = '0.142pt #000000';
           } else if (isFancy) {
             psText.style.fontFamily = 'LilyWang, cursive';
           }
@@ -822,3 +817,4 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
