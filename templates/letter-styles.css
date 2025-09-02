@@ -50,6 +50,7 @@ body {
 .block-font .date-display {
   font-size: 16pt; /* Smaller for block font */
   letter-spacing: 1pt; /* Add spacing between characters */
+  font-weight: 500; /* Subtle weight increase */
 }
 /* Letter content area with exact boundaries */
 .letter-content {
@@ -71,6 +72,7 @@ body {
 .block-font .date-display,
 .block-font p {
   font-family: 'Griffiths', Georgia, serif;
+  font-weight: 500; /* Subtle weight increase for all block font text */
 }
 .fancy-font .date-display,
 .fancy-font p {
@@ -121,5 +123,3 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
-
-
