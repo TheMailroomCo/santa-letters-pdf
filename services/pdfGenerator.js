@@ -19,13 +19,14 @@ async function fileToBase64(filePath) {
 }
 
 // Load and process CSS
-async function loadCSS(griffithsBase64, lilyWangBase64) {
+async function loadCSS(griffithsBase64, griffithsBoldBase64, lilyWangBase64) {
   try {
     const cssPath = path.join(__dirname, '../templates/letter-styles.css');
     let css = await fs.readFile(cssPath, 'utf8');
     
     // Replace font placeholders with actual base64 data
     css = css.replace('GRIFFITHS_BASE64', `data:font/truetype;base64,${griffithsBase64}`);
+    css = css.replace('GRIFFITHS_BOLD_BASE64', `data:font/truetype;base64,${griffithsBoldBase64}`);
     css = css.replace('LILYWANG_BASE64', `data:font/truetype;base64,${lilyWangBase64}`);
     
     return css;
@@ -590,6 +591,7 @@ async function generatePDF(orderData) {
 
   try {
     const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
+    const griffithsBoldBase64 = await fileToBase64(path.join(__dirname, '../fonts/GriffithsBold.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
     const backgroundBase64 = await fileToBase64(path.join(__dirname, '../background.png'));
 
@@ -600,7 +602,7 @@ async function generatePDF(orderData) {
       height: 906
     });
 
-    const styles = await loadCSS(griffithsBase64, lilyWangBase64);
+    const styles = await loadCSS(griffithsBase64, griffithsBoldBase64, lilyWangBase64);
 
     let letterContent;
     let finalTextForFile; // This will hold the corrected text for the .txt file
