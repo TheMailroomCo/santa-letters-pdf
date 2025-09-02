@@ -301,7 +301,7 @@ function getDynamicSizingScript() {
           p.style.lineHeight = isFancy ? '1.15' : '1.3';
           if (isBlockFont) {
             p.style.fontFamily = 'Griffiths, Georgia, serif';
-            p.style.fontWeight = '500';  // Added font-weight
+            p.style.fontWeight = '700';  // Using bold for more visible effect
           } else if (isFancy) {
             p.style.fontFamily = 'LilyWang, cursive';
           }
@@ -327,7 +327,7 @@ function getDynamicSizingScript() {
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
         if (isBlockFont) {
           p.style.fontFamily = 'Griffiths, Georgia, serif';
-          p.style.fontWeight = '500';  // Added font-weight
+          p.style.fontWeight = '700';  // Using bold for more visible effect
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
@@ -344,7 +344,7 @@ function getDynamicSizingScript() {
           
           if (isBlockFont) {
             psText.style.fontFamily = 'Griffiths, Georgia, serif';
-            psText.style.fontWeight = '500';  // Added font-weight
+            psText.style.fontWeight = '700';  // Using bold for more visible effect
           } else if (isFancy) {
             psText.style.fontFamily = 'LilyWang, cursive';
           }
@@ -372,10 +372,22 @@ function getDynamicSizingScript() {
         }
       }
       
-      // Handle date display font-weight
-      const dateDisplay = document.querySelector('.block-font .date-display');
-      if (dateDisplay) {
-        dateDisplay.style.fontWeight = '500';
+      // Handle date display font-weight - ONLY for Block font
+      if (isBlockFont) {
+        const dateDisplay = document.querySelector('.date-display');
+        if (dateDisplay) {
+          dateDisplay.style.fontWeight = '700';  // Using bold for more visible effect
+          console.log('Date font-weight applied:', dateDisplay.style.fontWeight);
+        }
+      }
+      
+      // Debug: Check if font-weight is applied to paragraphs
+      if (isBlockFont) {
+        const firstParagraph = container.querySelector('p');
+        if (firstParagraph) {
+          console.log('Paragraph font-weight:', firstParagraph.style.fontWeight);
+          console.log('Paragraph font-family:', firstParagraph.style.fontFamily);
+        }
       }
     }, 500);
   `;
@@ -825,5 +837,6 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
