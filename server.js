@@ -355,13 +355,15 @@ app.post('/merge-template', async (req, res) => {
       fullLetter += `\n\nP.S. ${req.body.psMessage}`;
     }
     
-    // Prepare envelope text for review
-    const envelopeText = `${req.body.childName || req.body.familyNames || ''}\n${req.body.magicalAddress || ''}`;
+    // Prepare envelope text for review - send name and address separately
+    const envelopeName = req.body.childName || req.body.familyNames || '';
+    const envelopeAddress = req.body.magicalAddress || '';
     
     res.json({
       success: true,
       letterText: fullLetter,
-      envelopeText: envelopeText,
+      childName: envelopeName,
+      magicalAddress: envelopeAddress,
       metadata: {
         template: req.body.template,
         font: req.body.font,
@@ -388,51 +390,12 @@ app.post('/merge-template', async (req, res) => {
 });
 
 // MAIN ENDPOINT: Generate PDF from corrected text (this is what Make.com should call after Claude)
-// UPDATED WITH CLEANING LOGIC FOR ENVELOPE DATA
 app.post('/generate-pdf-direct', async (req, res) => {
   try {
     console.log('📄 Generating PDF from corrected text for:', req.body.orderNumber);
     console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
     
-    // Helper function to clean envelope text
-    function cleanEnvelopeText(text) {
-      if (!text) return '';
-      
-      // Remove common artifacts from Make.com/Claude parsing
-      let cleaned = text
-        .replace(/[\[\]{}'"]/g, '')  // Remove brackets, braces, quotes
-        .replace(/\\"/g, '')          // Remove escaped quotes
-        .replace(/\\/g, '')           // Remove backslashes (will re-add for \n)
-        .replace(/\\n/g, '\n')        // Re-add newlines
-        .replace(/^\W+/, '')          // Remove non-word chars from start
-        .replace(/\W+$/, '')          // Remove non-word chars from end (except \n)
-        .trim();
-      
-      // Preserve newlines but remove trailing punctuation after the last line
-      const lines = cleaned.split('\n');
-      if (lines.length > 0) {
-        // Clean the last line specifically
-        lines[lines.length - 1] = lines[lines.length - 1].replace(/[^\w\s]+$/, '').trim();
-      }
-      
-      return lines.join('\n');
-    }
-    
-    // Clean the envelope data to remove rogue characters
-    const cleanEnvelopeName = cleanEnvelopeText(
-      req.body.correctedEnvelopeName || req.body.childName || ''
-    );
-    
-    const cleanEnvelopeAddress = cleanEnvelopeText(
-      req.body.correctedEnvelopeAddress || req.body.magicalAddress || ''
-    );
-    
-    console.log('🧹 Original envelope name:', req.body.correctedEnvelopeName || req.body.childName);
-    console.log('🏷️ Cleaned envelope name:', cleanEnvelopeName);
-    console.log('🧹 Original envelope address:', req.body.correctedEnvelopeAddress || req.body.magicalAddress);
-    console.log('🏠 Cleaned envelope address:', cleanEnvelopeAddress);
-    
-    // Build order data with cleaned envelope fields
+    // Build order data with properly cleaned fields
     const orderData = {
       orderNumber: req.body.orderNumber,
       template: req.body.template,
@@ -441,18 +404,35 @@ app.post('/generate-pdf-direct', async (req, res) => {
       envelopeColor: req.body.envelopeColor,
       letterType: req.body.letterType,
       
-      // Use cleaned envelope data
-      childName: cleanEnvelopeName,
-      letterName: cleanEnvelopeName,
-      magicalAddress: cleanEnvelopeAddress,
+      // Clean the envelope fields - APPLY SAME ESCAPING AS LETTER
+      childName: (req.body.correctedEnvelopeName || req.body.childName || '')
+        .replace(/\\n/g, '\n')      // Convert \n to actual newlines
+        .replace(/\\\*/g, '*')      // Convert \* to *
+        .replace(/\\\"/g, '"')      // Convert \" to "
+        .replace(/\\\'/g, "'"),     // Convert \' to '
+        
+      letterName: (req.body.correctedEnvelopeName || req.body.childName || '')  // Used for filename generation
+        .replace(/\\n/g, '\n')
+        .replace(/\\\*/g, '*')
+        .replace(/\\\"/g, '"')
+        .replace(/\\\'/g, "'"),
+        
+      magicalAddress: (req.body.correctedEnvelopeAddress || req.body.magicalAddress || '')
+        .replace(/\\n/g, '\n')      // Convert \n to actual newlines
+        .replace(/\\\*/g, '*')      // Convert \* to *
+        .replace(/\\\"/g, '"')      // Convert \" to "
+        .replace(/\\\'/g, "'"),     // Convert \' to '
       
-      // Pass the corrected letter content - clean up escaped characters
+      // Pass the corrected letter content with escaped character cleaning
       directLetterContent: (req.body.correctedLetter || '')
-        .replace(/\\\*/g, '*')     // Convert \* to *
-        .replace(/\\\"/g, '"')     // Convert \" to "
-        .replace(/\\\'/g, "'")     // Convert \' to '
+        .replace(/\\n/g, '\n')      // Convert \n to actual newlines
+        .replace(/\\\*/g, '*')      // Convert \* to *
+        .replace(/\\\"/g, '"')      // Convert \" to "
+        .replace(/\\\'/g, "'")      // Convert \' to '
     };
     
+    console.log('🏷️ Using envelope name:', orderData.childName);
+    console.log('🏠 Using envelope address:', orderData.magicalAddress);
     console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
     
     // Generate using existing function
