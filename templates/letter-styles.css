@@ -43,7 +43,7 @@ body {
 /* Block font bold class - used by JavaScript */
 .block-font-bold {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: 550 !important;
 }
 
 /* ========================
@@ -85,7 +85,7 @@ body {
   font-family: 'Griffiths', Georgia, serif !important;
   font-size: 16pt;
   letter-spacing: 1pt;
-  font-weight: 600 !important;
+  font-weight: 550 !important;
 }
 
 /* Fancy font date styling */
@@ -125,7 +125,7 @@ body {
 /* Block font paragraph styling */
 .block-font p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: 550 !important;
 }
 
 /* Fancy font paragraph styling */
@@ -165,7 +165,7 @@ body {
 /* Block font P.S. styling */
 .block-font .ps-message p {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 600 !important;
+  font-weight: 550 !important;
 }
 
 /* ========================
