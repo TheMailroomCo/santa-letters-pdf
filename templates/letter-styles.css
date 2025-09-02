@@ -48,9 +48,10 @@ body {
 }
 /* Block font specific date styling */
 .block-font .date-display {
+  font-family: 'Griffiths', Georgia, serif;
   font-size: 16pt; /* Smaller for block font */
   letter-spacing: 1pt; /* Add spacing between characters */
-  font-weight: 500; /* Subtle weight increase */
+  font-weight: 500 !important; /* Subtle weight increase - force it with !important */
 }
 /* Letter content area with exact boundaries */
 .letter-content {
@@ -72,7 +73,7 @@ body {
 .block-font .date-display,
 .block-font p {
   font-family: 'Griffiths', Georgia, serif;
-  font-weight: 500; /* Subtle weight increase for all block font text */
+  font-weight: 500 !important; /* Subtle weight increase for all block font text - force with !important */
 }
 .fancy-font .date-display,
 .fancy-font p {
