@@ -217,6 +217,7 @@ function processTemplateContent(templateHtml, orderData) {
     '{childName}': orderData.childName || '',
     '{letterName}': orderData.letterName || '',
     '{achievement}': orderData.achievement || '',
+    '{braveMoment}': orderData.braveMoment || '', // ADD THIS LINE
     '{location}': orderData.location || '',
     '{magicalAddress}': orderData.magicalAddress || '',
     '{psMessage}': orderData.psMessage || '',
@@ -833,3 +834,4 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
