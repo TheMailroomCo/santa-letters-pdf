@@ -125,23 +125,37 @@ async function fetchTemplate(templateFilename) {
 function processTemplateContent(templateHtml, orderData) {
   let processedHtml = templateHtml;
   
-  // Handle Write Your Own Letter FIRST, before other replacements
-  if (orderData.letterType === 'Write Your Own Letter' && orderData.achievement) {
-    console.log('🔍 Raw achievement:', orderData.achievement);
+  // Handle Write Your Own Letter - map the customer's content properly
+  if (orderData.letterType === 'Write Your Own Letter') {
+    console.log('🔍 Processing Write Your Own Letter');
+    console.log('🔍 Available fields:', Object.keys(orderData));
     
-    let content = orderData.achievement;
+    // Check multiple possible field names where the content might be
+    // Priority order: yourLetter, "Your Letter", achievement
+    let content = orderData.yourLetter || orderData['Your Letter'] || orderData.achievement || '';
     
-    // Handle different types of line breaks that might come from Make.com
+    console.log('🔍 Found content in field:', content ? 'yes' : 'no');
+    console.log('🔍 Content length:', content.length);
+    console.log('🔍 First 200 chars:', content.substring(0, 200));
+    
+    if (!content) {
+      console.error('❌ No content found for Write Your Own Letter!');
+      console.log('All orderData fields:', JSON.stringify(orderData, null, 2));
+      // Return a placeholder message if no content
+      processedHtml = processedHtml.replace('{yourLetter}', '<p>Letter content not found. Please check the order data mapping.</p>');
+      processedHtml = processedHtml.replace('{achievement}', '<p>Letter content not found. Please check the order data mapping.</p>');
+      return processedHtml;
+    }
+    
+    // Handle different types of line breaks
     content = content
       .replace(/\\n/g, '\n')  // Convert literal \n to actual newlines
       .replace(/\r\n/g, '\n') // Convert Windows line breaks
       .replace(/\r/g, '\n');  // Convert old Mac line breaks
     
-    console.log('📝 Content after normalization:', content);
-    
     let paragraphs;
     
-    // Check if we have <br> tags
+    // Check if we have HTML breaks
     if (content.includes('<br>')) {
       console.log('📝 Found <br> tags, processing as HTML');
       if (content.includes('<br><br>') || content.includes('<br> <br>')) {
@@ -154,27 +168,29 @@ function processTemplateContent(templateHtml, orderData) {
         paragraphs = `<p>${content.trim()}</p>`;
       }
     } 
+    // Check for double newlines (paragraph breaks)
+    else if (content.includes('\n\n')) {
+      console.log('📝 Found double newlines, treating as paragraph breaks');
+      paragraphs = content
+        .split(/\n\s*\n/)
+        .filter(p => p.trim())
+        .map(p => {
+          const cleaned = p.trim().replace(/\n/g, '<br>');
+          return `<p>${cleaned}</p>`;
+        })
+        .join('\n');
+    } 
+    // Single paragraph with possible line breaks
     else {
-      console.log('📝 Processing newline-separated content');
-      
-      if (content.includes('\n\n')) {
-        console.log('📝 Found double newlines, treating as paragraph breaks');
-        paragraphs = content
-          .split(/\n\s*\n/)
-          .filter(p => p.trim())
-          .map(p => {
-            const cleaned = p.trim().replace(/\n/g, '<br>');
-            return `<p>${cleaned}</p>`;
-          })
-          .join('\n');
-      } else {
-        console.log('📝 No double newlines found, treating as single paragraph with line breaks');
-        const lines = content.trim().replace(/\n/g, '<br>');
-        paragraphs = `<p>${lines}</p>`;
-      }
+      console.log('📝 No double newlines, treating as single paragraph with line breaks');
+      const lines = content.trim().replace(/\n/g, '<br>');
+      paragraphs = `<p>${lines}</p>`;
     }
     
-    console.log('📝 Generated HTML:', paragraphs);
+    console.log('📝 Generated HTML (first 300 chars):', paragraphs.substring(0, 300));
+    
+    // Replace BOTH possible placeholders (for compatibility)
+    processedHtml = processedHtml.replace('{yourLetter}', paragraphs);
     processedHtml = processedHtml.replace('{achievement}', paragraphs);
     
     return processedHtml;
