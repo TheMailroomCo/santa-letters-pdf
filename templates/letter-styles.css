@@ -14,7 +14,7 @@
 
 .block-font-bold {
   font-family: 'Griffiths', Georgia, serif !important;
-  font-weight: 700 !important;
+  font-weight: 500 !important;
 }
 
 body {
@@ -135,5 +135,6 @@ body {
 .personalized-text {
   /* No styling - just plain text */
 }
+
 
 
