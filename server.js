@@ -409,19 +409,28 @@ app.post('/generate-pdf-direct', async (req, res) => {
         .replace(/\\n/g, '\n')      // Convert \n to actual newlines
         .replace(/\\\*/g, '*')      // Convert \* to *
         .replace(/\\\"/g, '"')      // Convert \" to "
-        .replace(/\\\'/g, "'"),     // Convert \' to '
+        .replace(/\\\'/g, "'")      // Convert \' to '
+        .replace(/[\[\]{}'"]/g, '') // Remove brackets, braces, quotes
+        .replace(/\/+$/, '')        // Remove trailing forward slashes
+        .trim(),
         
       letterName: (req.body.correctedEnvelopeName || req.body.childName || '')  // Used for filename generation
         .replace(/\\n/g, '\n')
         .replace(/\\\*/g, '*')
         .replace(/\\\"/g, '"')
-        .replace(/\\\'/g, "'"),
+        .replace(/\\\'/g, "'")
+        .replace(/[\[\]{}'"]/g, '')
+        .replace(/\/+$/, '')
+        .trim(),
         
       magicalAddress: (req.body.correctedEnvelopeAddress || req.body.magicalAddress || '')
         .replace(/\\n/g, '\n')      // Convert \n to actual newlines
         .replace(/\\\*/g, '*')      // Convert \* to *
         .replace(/\\\"/g, '"')      // Convert \" to "
-        .replace(/\\\'/g, "'"),     // Convert \' to '
+        .replace(/\\\'/g, "'")      // Convert \' to '
+        .replace(/[\[\]{}'"]/g, '') // Remove brackets, braces, quotes
+        .replace(/\/+$/, '')        // Remove trailing forward slashes
+        .trim(),
       
       // Pass the corrected letter content with escaped character cleaning
       directLetterContent: (req.body.correctedLetter || '')
