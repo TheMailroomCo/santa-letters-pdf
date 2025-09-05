@@ -170,15 +170,13 @@ async function generateBellyBandHTML(shippingFirstName, griffithsBase64, lilyWan
   const css = await generateBellyBandCSS(griffithsBase64, lilyWangBase64);
   
   // Split the message into two parts - before and after ribbon gap
-  const messageTop = `Every year, I witness something extraordinary. Parents who move mountains to keep wonder alive. Who stay up late crafting magic. Who guard childhood's fleeting sparkle with fierce devotion.
+  const messageTop = `Every year, I witness something extraordinary. Parents who move mountains to keep wonder alive. Who guard childhood's fleeting sparkle with fierce devotion.
 
-You are one of these remarkable souls.`;
+You are one of these remarkable souls.
 
-  const messageBottom = `Thank you for inviting me into your family's story this Christmas and for knowing that some magic is worth preserving, one careful detail at a time.
+Thank you for inviting me into your family's story this Christmas and for knowing that some magic is worth preserving, one careful detail at a time.`;
 
-This year's letters were crafted with particular care by my trusted Magic Keeper, Tash, who helps ensure each word reaches exactly where it needs to be.
-
-May your home be filled with the wonder you so lovingly create.`;
+  const messageBottom = `This year's letters were crafted with particular care by my trusted Magic Keeper, Tash, who helps ensure each word reaches exactly where it needs to be. May your home be filled with the wonder you so lovingly create.`;
   
   return `
     <!DOCTYPE html>
