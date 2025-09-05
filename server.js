@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
     <p>Server is running!</p>
     <p><a href="/test">Run Letter Tests</a></p>
     <p><a href="/test-labels">Test Present Labels</a></p>
+    <p><a href="/test-belly-band">Test Belly Band</a></p>
   `);
 });
 
@@ -254,6 +255,51 @@ app.get('/test-labels', async (req, res) => {
   }
 });
 
+// Endpoint for belly bands
+app.post('/generate-belly-band', async (req, res) => {
+  try {
+    console.log('🎀 Received belly band webhook:', JSON.stringify(req.body, null, 2));
+    
+    const result = await generateBellyBand(req.body);
+    
+    res.json({
+      success: true,
+      filename: result.filename,
+      url: `${req.protocol}://${req.get('host')}${result.url}`
+    });
+  } catch (error) {
+    console.error('❌ Error generating belly band:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Test endpoint for belly bands
+app.get('/test-belly-band', async (req, res) => {
+  const testData = {
+    orderNumber: "TEST001",
+    shippingFirstName: "Sarah"
+  };
+  
+  try {
+    const result = await generateBellyBand(testData);
+    res.send(`
+      <h1>🎀 Belly Band Test</h1>
+      <p>Generated successfully!</p>
+      <p><a href="${result.url}" target="_blank">View PDF</a></p>
+      <p><a href="/">Back to Home</a></p>
+    `);
+  } catch (error) {
+    res.send(`
+      <h1>Error</h1>
+      <p>${error.message}</p>
+      <p><a href="/">Back to Home</a></p>
+    `);
+  }
+});
+
 // Test merge template endpoint
 app.get('/test-merge', async (req, res) => {
   const testData = {
@@ -445,7 +491,7 @@ app.post('/generate-pdf-direct', async (req, res) => {
     console.log('🏠 Using envelope address:', orderData.magicalAddress);
     console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
     
-  // Generate using existing function
+    // Generate using existing function
     const result = await generatePDF(orderData);
     
     // ADD BELLY BAND GENERATION HERE
@@ -515,5 +561,3 @@ app.post('/generate-pdf-from-corrected', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
-
-
