@@ -107,6 +107,8 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
       color: #4b0000;
       text-align: center;
       margin-bottom: 3mm;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
     }
     
     /* Ribbon gap */
@@ -130,6 +132,8 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
       color: #4b0000;
       text-align: center;
       margin-bottom: 3mm;
+      font-weight: 700;
+      letter-spacing: 0.3pt;
     }
     
     /* Signature section */
@@ -139,6 +143,8 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
       text-align: center;
       color: #4b0000;
       line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: 0.2pt;
     }
     
     .signature strong {
@@ -231,8 +237,8 @@ async function generateBellyBand(orderData) {
   });
   
   try {
-    // Load fonts as base64
-    const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
+    // Load fonts as base64 - USING GRIFFITHS BOLD
+    const griffithsBoldBase64 = await fileToBase64(path.join(__dirname, '../fonts/GriffithsBold.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
     
     // Create page
@@ -247,7 +253,7 @@ async function generateBellyBand(orderData) {
     // Generate HTML with shipping first name
     const html = await generateBellyBandHTML(
       displayName,
-      griffithsBase64,
+      griffithsBoldBase64,
       lilyWangBase64
     );
     
