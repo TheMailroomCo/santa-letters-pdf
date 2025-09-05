@@ -47,23 +47,23 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
       position: relative;
     }
     
-    /* Fold guide line at 82.5mm from top */
+    /* Fold guide line at 82.5mm from top - now only 15mm wide, centered */
     .fold-guide-top {
       position: absolute;
       top: 82.5mm;
-      left: 0;
-      width: 100%;
+      left: 17.5mm;  /* Center the 15mm line (50mm - 15mm) / 2 */
+      width: 15mm;
       height: 0.25pt;
       background-color: #e0e0e0;
       z-index: 1;
     }
     
-    /* Fold guide line at 212.5mm from top (82.5mm + 130mm) */
+    /* Fold guide line at 212.5mm from top (82.5mm + 130mm) - now only 15mm wide, centered */
     .fold-guide-bottom {
       position: absolute;
       top: 212.5mm;  /* 82.5mm + 130mm envelope height */
-      left: 0;
-      width: 100%;
+      left: 17.5mm;  /* Center the 15mm line (50mm - 15mm) / 2 */
+      width: 15mm;
       height: 0.25pt;
       background-color: #e0e0e0;
       z-index: 1;
@@ -92,8 +92,8 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
     /* Customer name */
     .customer-name {
       font-family: 'LilyWang', cursive;
-      font-size: 14pt;
-      color: #000000;
+      font-size: 16pt;
+      color: #4b0000;
       text-align: center;
       margin-bottom: 4mm;
       line-height: 1.1;
@@ -102,9 +102,9 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
     /* Main message text - top part */
     .message-top {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 6.5pt;
-      line-height: 1.3;
-      color: #000000;
+      font-size: 7.5pt;
+      line-height: 1.35;
+      color: #4b0000;
       text-align: center;
       margin-bottom: 3mm;
     }
@@ -125,9 +125,9 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
     /* Main message text - bottom part */
     .message-bottom {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 6.5pt;
-      line-height: 1.3;
-      color: #000000;
+      font-size: 7.5pt;
+      line-height: 1.35;
+      color: #4b0000;
       text-align: center;
       margin-bottom: 3mm;
     }
@@ -135,9 +135,9 @@ async function generateBellyBandCSS(griffithsBase64, lilyWangBase64) {
     /* Signature section */
     .signature {
       font-family: 'Griffiths', Georgia, serif;
-      font-size: 6.5pt;
+      font-size: 7.5pt;
       text-align: center;
-      color: #000000;
+      color: #4b0000;
       line-height: 1.2;
     }
     
