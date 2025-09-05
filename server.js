@@ -445,10 +445,21 @@ app.post('/generate-pdf-direct', async (req, res) => {
     console.log('🏠 Using envelope address:', orderData.magicalAddress);
     console.log('📝 Using corrected letter content (first 100 chars):', (orderData.directLetterContent || '').substring(0, 100));
     
-    // Generate using existing function
+  // Generate using existing function
     const result = await generatePDF(orderData);
     
-    res.json({
+    // ADD BELLY BAND GENERATION HERE
+    let bellyBandResult = null;
+    if (req.body.generateBellyBand || req.body.shippingFirstName) {
+      console.log('🎀 Generating belly band for:', req.body.shippingFirstName);
+      bellyBandResult = await generateBellyBand({
+        orderNumber: req.body.orderNumber,
+        shippingFirstName: req.body.shippingFirstName || 'Dear Friend'
+      });
+    }
+    
+    // Build response
+    const response = {
       success: true,
       letter: {
         filename: result.letter.filename,
@@ -462,7 +473,17 @@ app.post('/generate-pdf-direct', async (req, res) => {
         filename: result.envelope.filename,
         url: `${req.protocol}://${req.get('host')}${result.envelope.url}`
       }
-    });
+    };
+    
+    // Add belly band to response if generated
+    if (bellyBandResult) {
+      response.bellyBand = {
+        filename: bellyBandResult.filename,
+        url: `${req.protocol}://${req.get('host')}${bellyBandResult.url}`
+      };
+    }
+    
+    res.json(response);
     
   } catch (error) {
     console.error('❌ Error generating PDF from corrected text:', error);
@@ -494,4 +515,5 @@ app.post('/generate-pdf-from-corrected', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
 
