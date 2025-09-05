@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const { generatePDF, getTemplateFilename, fetchTemplate, processTemplateContent } = require('./services/pdfGenerator');
 const { generatePresentLabels } = require('./services/presentLabelGenerator');
+const { generateBellyBand } = require('./services/bellyBandGenerator');
 require('dotenv').config();
 
 const app = express();
@@ -493,3 +494,4 @@ app.post('/generate-pdf-from-corrected', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎅 Santa Letter PDF Server running on port ${PORT}`);
 });
+
