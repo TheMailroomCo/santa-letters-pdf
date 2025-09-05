@@ -235,8 +235,8 @@ async function generateBellyBand(orderData) {
   });
   
   try {
-    // Load fonts as base64 - USING GRIFFITHS BOLD
-    const griffithsBoldBase64 = await fileToBase64(path.join(__dirname, '../fonts/GriffithsBold.ttf'));
+    // Load fonts as base64 - using regular Griffiths with bold styling
+    const griffithsBase64 = await fileToBase64(path.join(__dirname, '../fonts/Griffiths.ttf'));
     const lilyWangBase64 = await fileToBase64(path.join(__dirname, '../fonts/LilyWang.otf'));
     
     // Create page
@@ -251,7 +251,7 @@ async function generateBellyBand(orderData) {
     // Generate HTML with shipping first name
     const html = await generateBellyBandHTML(
       displayName,
-      griffithsBoldBase64,
+      griffithsBase64,
       lilyWangBase64
     );
     
