@@ -110,7 +110,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       bottom: 4mm;
       left: 18.232mm;
       width: 50mm;
-      height: 0.25pt;  /* Reduced from 0.5pt to make it thinner */
+      height: 0.10pt;  /* Reduced from 0.5pt to make it thinner */
       background-color: #707070;
       z-index: 1;  /* Ensure line is behind the text */
     }
