@@ -110,8 +110,9 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       bottom: 4mm;
       left: 18.232mm;
       width: 50mm;
-      height: 0.5pt;
+      height: 0.25pt;  /* Reduced from 0.5pt to make it thinner */
       background-color: #707070;
+      z-index: 1;  /* Ensure line is behind the text */
     }
     
     /* Child's name - sits ON the line */
@@ -126,6 +127,7 @@ async function generateLabelCSS(griffithsBase64, lilyWangBase64) {
       text-align: center;
       line-height: 1;
       white-space: nowrap;  /* Force single line */
+      z-index: 2;  /* Ensure name appears in front of the line */
     }
     
     /* Dynamic sizing for longer names - aggressive scaling */
