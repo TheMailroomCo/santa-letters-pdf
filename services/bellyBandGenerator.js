@@ -170,7 +170,7 @@ async function generateBellyBandHTML(shippingFirstName, griffithsBase64, lilyWan
   const css = await generateBellyBandCSS(griffithsBase64, lilyWangBase64);
   
   // Split the message into two parts - before and after ribbon gap
-  const messageTop = `Every year, I witness something extraordinary. Parents who move mountains to keep wonder alive. Who guard childhood's fleeting sparkle with fierce devotion.
+  const messageTop = `Every year, I witness something extraordinary. Adults who move mountains to keep wonder alive. Who guard childhood's fleeting sparkle with fierce devotion.
 
 You are one of these remarkable souls.
 
