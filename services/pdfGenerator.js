@@ -286,7 +286,20 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
+      // Check if this is Snow Globe Heart template
+      const letterText = container.innerText || '';
+      const isSnowGlobeHeart = letterText.includes('snow globe heart') || 
+                               letterText.includes('Snow Globe Heart');
+      
+      // Standard starting sizes
       let fontSize = isFancy ? 28 : 30;
+      
+      // Boost ONLY Block font for Snow Globe Heart
+      if (isSnowGlobeHeart && isBlockFont) {
+        fontSize = 32; // Boost Block font from 30 to 32 for this template
+        console.log('Snow Globe Heart detected with Block font - boosting to 32pt');
+      }
+      
       const minSize = 10.8;
       const maxSize = 45;
       
@@ -834,5 +847,6 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
