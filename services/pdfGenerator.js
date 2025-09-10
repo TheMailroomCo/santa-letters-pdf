@@ -685,7 +685,13 @@ async function generatePDF(orderData) {
     const fontClass = orderData.font === 'Fancy' ? 'fancy-font' : 'block-font';
     const year = orderData.letterYear || '2025';
 
-    // Build letter HTML
+    // Determine template class - works for both normal and corrected text
+let templateClass = '';
+if (orderData.template) {
+  templateClass = orderData.template.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+// Build letter HTML
 const letterHtml = `
 <!DOCTYPE html>
 <html>
@@ -694,7 +700,7 @@ const letterHtml = `
   <style>${styles}</style>
 </head>
 <body>
-  <div class="letter-container ${fontClass}" data-template="${orderData.template || ''}">
+  <div class="letter-container ${fontClass} template-${templateClass}">
     <div class="date-display">
       <span>${year}</span>
     </div>
@@ -850,6 +856,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
