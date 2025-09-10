@@ -286,18 +286,26 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Check if this is Snow Globe Heart template
-      const letterText = container.innerText || '';
-      const isSnowGlobeHeart = letterText.includes('snow globe heart') || 
-                               letterText.includes('Snow Globe Heart');
+      // Check template from data attribute
+      const letterContainer = document.querySelector('.letter-container');
+      const template = letterContainer ? letterContainer.getAttribute('data-template') : '';
+      const isSnowGlobeHeart = template && (
+        template.toLowerCase().includes('snow globe') || 
+        template === 'Snow Globe Heart'
+      );
+      
+      // Log for debugging
+      console.log('Template detected:', template);
+      console.log('Is Snow Globe Heart:', isSnowGlobeHeart);
+      console.log('Is Block Font:', isBlockFont);
       
       // Standard starting sizes
       let fontSize = isFancy ? 28 : 30;
       
       // Boost ONLY Block font for Snow Globe Heart
       if (isSnowGlobeHeart && isBlockFont) {
-        fontSize = 32; // Boost Block font from 30 to 32 for this template
-        console.log('Snow Globe Heart detected with Block font - boosting to 32pt');
+        fontSize = 35; // Try a bigger boost - was 32, now 35
+        console.log('🎯 Snow Globe Heart + Block font detected - boosting to 35pt');
       }
       
       const minSize = 10.8;
@@ -307,6 +315,7 @@ function getDynamicSizingScript() {
       let high = maxSize;
       let bestFit = fontSize;
       
+      // Rest of your existing code stays the same...
       for (let attempts = 0; attempts < 25; attempts++) {
         const mid = (low + high) / 2;
         
@@ -335,6 +344,9 @@ function getDynamicSizingScript() {
         if (high - low < 0.1) break;
       }
       
+      // Log final size for debugging
+      console.log('Final font size for this letter:', bestFit + 'pt');
+      
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
         p.style.lineHeight = isFancy ? '1.15' : '1.3';
@@ -345,7 +357,7 @@ function getDynamicSizingScript() {
         }
       });
       
-      // Handle P.S. message
+      // Handle P.S. message (rest of your code)...
       const psMessage = document.querySelector('.ps-message');
       const psInner = document.querySelector('.ps-message-inner');
       if (psMessage && psInner) {
@@ -388,15 +400,6 @@ function getDynamicSizingScript() {
         const dateDisplay = document.querySelector('.date-display');
         if (dateDisplay) {
           dateDisplay.classList.add('block-font-bold');
-          console.log('Date class applied:', dateDisplay.className);
-        }
-      }
-      
-      // Debug: Check if class is applied to paragraphs
-      if (isBlockFont) {
-        const firstParagraph = container.querySelector('p');
-        if (firstParagraph) {
-          console.log('Paragraph classes:', firstParagraph.className);
         }
       }
     }, 500);
@@ -847,6 +850,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
