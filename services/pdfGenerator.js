@@ -683,7 +683,7 @@ async function generatePDF(orderData) {
     const year = orderData.letterYear || '2025';
 
     // Build letter HTML
-    const letterHtml = `
+const letterHtml = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -691,7 +691,7 @@ async function generatePDF(orderData) {
   <style>${styles}</style>
 </head>
 <body>
-  <div class="letter-container ${fontClass}">
+  <div class="letter-container ${fontClass}" data-template="${orderData.template || ''}">
     <div class="date-display">
       <span>${year}</span>
     </div>
@@ -847,6 +847,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
