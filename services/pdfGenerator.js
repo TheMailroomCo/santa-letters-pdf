@@ -276,7 +276,6 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Dynamic text sizing script for letters
 function getDynamicSizingScript() {
   return `
     setTimeout(() => {
@@ -286,36 +285,28 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Check template from data attribute
-      const letterContainer = document.querySelector('.letter-container');
-      const template = letterContainer ? letterContainer.getAttribute('data-template') : '';
-      const isSnowGlobeHeart = template && (
-        template.toLowerCase().includes('snow globe') || 
-        template === 'Snow Globe Heart'
-      );
+      // Check if content contains "snow globe heart" text
+      const letterText = container.innerText || container.textContent || '';
+      const isSnowGlobeHeart = letterText.toLowerCase().includes('snow globe heart');
       
-      // Log for debugging
-      console.log('Template detected:', template);
-      console.log('Is Snow Globe Heart:', isSnowGlobeHeart);
-      console.log('Is Block Font:', isBlockFont);
+      console.log('Is Snow Globe Heart detected:', isSnowGlobeHeart);
       
-      // Standard starting sizes
+      // ADJUSTED PARAMETERS FOR SNOW GLOBE HEART
       let fontSize = isFancy ? 28 : 30;
-      
-      // Boost ONLY Block font for Snow Globe Heart
-      if (isSnowGlobeHeart && isBlockFont) {
-        fontSize = 35; // Try a bigger boost - was 32, now 35
-        console.log('🎯 Snow Globe Heart + Block font detected - boosting to 35pt');
-      }
-      
-      const minSize = 10.8;
+      let minSize = 10.8;
       const maxSize = 45;
+      
+      // KEY CHANGES FOR SNOW GLOBE HEART + BLOCK FONT
+      if (isSnowGlobeHeart && isBlockFont) {
+        minSize = 13;  // Don't let it go below 13pt
+        fontSize = 35;  // Start search from higher point
+        console.log('Snow Globe Heart Block: Using minSize=13, starting=35');
+      }
       
       let low = minSize;
       let high = maxSize;
       let bestFit = fontSize;
       
-      // Rest of your existing code stays the same...
       for (let attempts = 0; attempts < 25; attempts++) {
         const mid = (low + high) / 2;
         
@@ -334,7 +325,17 @@ function getDynamicSizingScript() {
         const containerHeight = container.clientHeight;
         const contentHeight = container.scrollHeight;
         
-        if (contentHeight <= containerHeight) {
+        // SPECIAL HANDLING FOR SNOW GLOBE HEART
+        let fitsCriteria;
+        if (isSnowGlobeHeart && isBlockFont) {
+          // Allow 102% overflow for Snow Globe Heart (slightly looser fit)
+          fitsCriteria = contentHeight <= (containerHeight * 1.02);
+        } else {
+          // Normal strict fit for other templates
+          fitsCriteria = contentHeight <= containerHeight;
+        }
+        
+        if (fitsCriteria) {
           bestFit = mid;
           low = mid;
         } else {
@@ -344,8 +345,13 @@ function getDynamicSizingScript() {
         if (high - low < 0.1) break;
       }
       
-      // Log final size for debugging
-      console.log('Final font size for this letter:', bestFit + 'pt');
+      // OVERRIDE: If Snow Globe Heart Block is still too small, force minimum
+      if (isSnowGlobeHeart && isBlockFont && bestFit < 13) {
+        bestFit = 13;
+        console.log('Forcing minimum 13pt for Snow Globe Heart Block');
+      }
+      
+      console.log('Final font size:', bestFit + 'pt');
       
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
@@ -357,7 +363,7 @@ function getDynamicSizingScript() {
         }
       });
       
-      // Handle P.S. message (rest of your code)...
+      // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
       const psInner = document.querySelector('.ps-message-inner');
       if (psMessage && psInner) {
@@ -856,6 +862,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
