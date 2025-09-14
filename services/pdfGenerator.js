@@ -289,12 +289,17 @@ function getDynamicSizingScript() {
       const letterText = container.innerText || container.textContent || '';
       const lowerText = letterText.toLowerCase();
       
-      // Detect templates by their unique content
+      // Detect templates by their unique content - simplified detection
       const isSnowGlobeHeart = lowerText.includes('snow globe heart');
-      const isFamilyLetter = lowerText.includes("each other's first friends") || 
-                            lowerText.includes("each other's fiercest protectors") ||
-                            lowerText.includes("each other's forever home");
       
+      // Family Letter detection - look for unique phrases without apostrophes
+      const isFamilyLetter = lowerText.includes('first friends') || 
+                            lowerText.includes('fiercest protectors') ||
+                            lowerText.includes('forever home') ||
+                            lowerText.includes('secret language you share') ||
+                            lowerText.includes('whole story');
+      
+      console.log('Letter text sample (first 200 chars):', letterText.substring(0, 200));
       console.log('Is Snow Globe Heart detected:', isSnowGlobeHeart);
       console.log('Is Family Letter detected:', isFamilyLetter);
       
@@ -876,6 +881,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
