@@ -276,6 +276,7 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
+// Dynamic text sizing script for letters
 function getDynamicSizingScript() {
   return `
     setTimeout(() => {
@@ -285,25 +286,31 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Count text to determine if this is a dense letter
+      // Check if content contains specific template text
       const letterText = container.innerText || container.textContent || '';
-      const wordCount = letterText.split(/\\s+/).length;
-      const isDenseLetter = wordCount > 350; // Letters with more than 350 words are "dense"
+      const isSnowGlobeHeart = letterText.toLowerCase().includes('snow globe heart');
+      const isFamilyLetter = letterText.toLowerCase().includes('fiercest protectors');
       
-      console.log('Word count:', wordCount);
-      console.log('Is dense letter:', isDenseLetter);
-      console.log('Is Block font:', isBlockFont);
+      console.log('Is Snow Globe Heart detected:', isSnowGlobeHeart);
+      console.log('Is Family Letter detected:', isFamilyLetter);
       
-      // ADJUSTED PARAMETERS
+      // ADJUSTED PARAMETERS FOR TEMPLATES
       let fontSize = isFancy ? 28 : 30;
       let minSize = 10.8;
       const maxSize = 45;
       
-      // For ANY dense letter with Block font, boost the sizing
-      if (isDenseLetter && isBlockFont) {
-        minSize = 13;  // Won't go below 13pt
-        fontSize = 35;  // Start searching from 35pt
-        console.log('Dense Block letter detected - using minSize=13, starting=35');
+      // KEY CHANGES FOR SNOW GLOBE HEART + BLOCK FONT
+      if (isSnowGlobeHeart && isBlockFont) {
+        minSize = 13;  // Don't let it go below 13pt
+        fontSize = 35;  // Start search from higher point
+        console.log('Snow Globe Heart Block: Using minSize=13, starting=35');
+      }
+      
+      // KEY CHANGES FOR FAMILY LETTER + BLOCK FONT
+      if (isFamilyLetter && isBlockFont) {
+        minSize = 13;  // Don't let it go below 13pt
+        fontSize = 35;  // Start search from higher point
+        console.log('Family Letter Block: Using minSize=13, starting=35');
       }
       
       let low = minSize;
@@ -328,12 +335,14 @@ function getDynamicSizingScript() {
         const containerHeight = container.clientHeight;
         const contentHeight = container.scrollHeight;
         
-        // Allow slight overflow for dense Block letters
+        // SPECIAL HANDLING FOR TEMPLATES WITH DENSE TEXT
         let fitsCriteria;
-        if (isDenseLetter && isBlockFont) {
-          fitsCriteria = contentHeight <= (containerHeight * 1.02); // 2% tolerance
+        if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont) {
+          // Allow 102% overflow for these templates (slightly looser fit)
+          fitsCriteria = contentHeight <= (containerHeight * 1.02);
         } else {
-          fitsCriteria = contentHeight <= containerHeight; // Strict fit
+          // Normal strict fit for other templates
+          fitsCriteria = contentHeight <= containerHeight;
         }
         
         if (fitsCriteria) {
@@ -344,6 +353,12 @@ function getDynamicSizingScript() {
         }
         
         if (high - low < 0.1) break;
+      }
+      
+      // OVERRIDE: If Snow Globe Heart or Family Letter Block is still too small, force minimum
+      if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont && bestFit < 13) {
+        bestFit = 13;
+        console.log('Forcing minimum 13pt for dense template with Block font');
       }
       
       console.log('Final font size:', bestFit + 'pt');
@@ -401,6 +416,15 @@ function getDynamicSizingScript() {
         const dateDisplay = document.querySelector('.date-display');
         if (dateDisplay) {
           dateDisplay.classList.add('block-font-bold');
+          console.log('Date class applied:', dateDisplay.className);
+        }
+      }
+      
+      // Debug: Check if class is applied to paragraphs
+      if (isBlockFont) {
+        const firstParagraph = container.querySelector('p');
+        if (firstParagraph) {
+          console.log('Paragraph classes:', firstParagraph.className);
         }
       }
     }, 500);
@@ -857,6 +881,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
