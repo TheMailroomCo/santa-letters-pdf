@@ -285,13 +285,20 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Check if content contains "snow globe heart" text
+      // Check if content contains specific template text
       const letterText = container.innerText || container.textContent || '';
-      const isSnowGlobeHeart = letterText.toLowerCase().includes('snow globe heart');
+      const lowerText = letterText.toLowerCase();
+      
+      // Detect templates by their unique content
+      const isSnowGlobeHeart = lowerText.includes('snow globe heart');
+      const isFamilyLetter = lowerText.includes("each other's first friends") || 
+                            lowerText.includes("each other's fiercest protectors") ||
+                            lowerText.includes("each other's forever home");
       
       console.log('Is Snow Globe Heart detected:', isSnowGlobeHeart);
+      console.log('Is Family Letter detected:', isFamilyLetter);
       
-      // ADJUSTED PARAMETERS FOR SNOW GLOBE HEART
+      // ADJUSTED PARAMETERS FOR TEMPLATES
       let fontSize = isFancy ? 28 : 30;
       let minSize = 10.8;
       const maxSize = 45;
@@ -301,6 +308,13 @@ function getDynamicSizingScript() {
         minSize = 13;  // Don't let it go below 13pt
         fontSize = 35;  // Start search from higher point
         console.log('Snow Globe Heart Block: Using minSize=13, starting=35');
+      }
+      
+      // KEY CHANGES FOR FAMILY LETTER + BLOCK FONT
+      if (isFamilyLetter && isBlockFont) {
+        minSize = 13;  // Don't let it go below 13pt
+        fontSize = 35;  // Start search from higher point
+        console.log('Family Letter Block: Using minSize=13, starting=35');
       }
       
       let low = minSize;
@@ -325,10 +339,10 @@ function getDynamicSizingScript() {
         const containerHeight = container.clientHeight;
         const contentHeight = container.scrollHeight;
         
-        // SPECIAL HANDLING FOR SNOW GLOBE HEART
+        // SPECIAL HANDLING FOR DENSE TEMPLATES
         let fitsCriteria;
-        if (isSnowGlobeHeart && isBlockFont) {
-          // Allow 102% overflow for Snow Globe Heart (slightly looser fit)
+        if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont) {
+          // Allow 102% overflow for these templates (slightly looser fit)
           fitsCriteria = contentHeight <= (containerHeight * 1.02);
         } else {
           // Normal strict fit for other templates
@@ -345,10 +359,10 @@ function getDynamicSizingScript() {
         if (high - low < 0.1) break;
       }
       
-      // OVERRIDE: If Snow Globe Heart Block is still too small, force minimum
-      if (isSnowGlobeHeart && isBlockFont && bestFit < 13) {
+      // OVERRIDE: If Snow Globe Heart or Family Letter Block is still too small, force minimum
+      if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont && bestFit < 13) {
         bestFit = 13;
-        console.log('Forcing minimum 13pt for Snow Globe Heart Block');
+        console.log('Forcing minimum 13pt for dense template with Block font');
       }
       
       console.log('Final font size:', bestFit + 'pt');
@@ -862,6 +876,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
