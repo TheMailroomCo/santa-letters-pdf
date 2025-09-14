@@ -355,10 +355,14 @@ function getDynamicSizingScript() {
         if (high - low < 0.1) break;
       }
       
-      // OVERRIDE: If Snow Globe Heart or Family Letter Block is still too small, force minimum
-      if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont && bestFit < 13) {
+      // OVERRIDE: If templates are still too small, enforce minimums
+      if (isSnowGlobeHeart && isBlockFont && bestFit < 13) {
         bestFit = 13;
-        console.log('Forcing minimum 13pt for dense template with Block font');
+        console.log('Forcing minimum 13pt for Snow Globe Heart Block font');
+      }
+      if (isFamilyLetter && isBlockFont && bestFit < 11.5) {
+        bestFit = 11.5;
+        console.log('Forcing minimum 11.5pt for Family Letter Block font');
       }
       
       console.log('Final font size:', bestFit + 'pt');
@@ -881,6 +885,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
