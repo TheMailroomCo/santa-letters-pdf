@@ -285,58 +285,25 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
-      // Check if content contains specific template text
+      // Count text to determine if this is a dense letter
       const letterText = container.innerText || container.textContent || '';
-      const lowerText = letterText.toLowerCase();
+      const wordCount = letterText.split(/\\s+/).length;
+      const isDenseLetter = wordCount > 350; // Letters with more than 350 words are "dense"
       
-      // Debug: Show what we're actually seeing
-      console.log('=== TEMPLATE DETECTION DEBUG ===');
-      console.log('First 300 chars of letter:', letterText.substring(0, 300));
+      console.log('Word count:', wordCount);
+      console.log('Is dense letter:', isDenseLetter);
+      console.log('Is Block font:', isBlockFont);
       
-      // Detect templates by their unique content
-      const isSnowGlobeHeart = lowerText.includes('snow globe heart');
-      
-      // Family Letter detection - multiple unique phrases to check
-      const familyPhrases = [
-        'first friends',
-        'fiercest protectors', 
-        'forever home',
-        'secret language',
-        'whole story',
-        'guard each other',
-        'before you knew anyone else',
-        'miles or years stretch between you'
-      ];
-      
-      const isFamilyLetter = familyPhrases.some(phrase => lowerText.includes(phrase));
-      
-      // Log which phrase was found
-      if (isFamilyLetter) {
-        const foundPhrase = familyPhrases.find(phrase => lowerText.includes(phrase));
-        console.log('Family Letter detected via phrase:', foundPhrase);
-      }
-      
-      console.log('Is Snow Globe Heart:', isSnowGlobeHeart);
-      console.log('Is Family Letter:', isFamilyLetter);
-      console.log('Is Block Font:', isBlockFont);
-      
-      // ADJUSTED PARAMETERS FOR TEMPLATES
+      // ADJUSTED PARAMETERS
       let fontSize = isFancy ? 28 : 30;
       let minSize = 10.8;
       const maxSize = 45;
       
-      // KEY CHANGES FOR SNOW GLOBE HEART + BLOCK FONT
-      if (isSnowGlobeHeart && isBlockFont) {
-        minSize = 13;
-        fontSize = 35;
-        console.log('✅ Snow Globe Heart Block: Using minSize=13, starting=35');
-      }
-      
-      // KEY CHANGES FOR FAMILY LETTER + BLOCK FONT
-      if (isFamilyLetter && isBlockFont) {
-        minSize = 13;
-        fontSize = 35;
-        console.log('✅ Family Letter Block: Using minSize=13, starting=35');
+      // For ANY dense letter with Block font, boost the sizing
+      if (isDenseLetter && isBlockFont) {
+        minSize = 13;  // Won't go below 13pt
+        fontSize = 35;  // Start searching from 35pt
+        console.log('Dense Block letter detected - using minSize=13, starting=35');
       }
       
       let low = minSize;
@@ -361,12 +328,12 @@ function getDynamicSizingScript() {
         const containerHeight = container.clientHeight;
         const contentHeight = container.scrollHeight;
         
-        // SPECIAL HANDLING FOR DENSE TEMPLATES
+        // Allow slight overflow for dense Block letters
         let fitsCriteria;
-        if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont) {
-          fitsCriteria = contentHeight <= (containerHeight * 1.02);
+        if (isDenseLetter && isBlockFont) {
+          fitsCriteria = contentHeight <= (containerHeight * 1.02); // 2% tolerance
         } else {
-          fitsCriteria = contentHeight <= containerHeight;
+          fitsCriteria = contentHeight <= containerHeight; // Strict fit
         }
         
         if (fitsCriteria) {
@@ -379,14 +346,7 @@ function getDynamicSizingScript() {
         if (high - low < 0.1) break;
       }
       
-      // OVERRIDE: If dense template Block is still too small, force minimum
-      if ((isSnowGlobeHeart || isFamilyLetter) && isBlockFont && bestFit < 13) {
-        bestFit = 13;
-        console.log('⚠️ Forcing minimum 13pt for dense template with Block font');
-      }
-      
-      console.log('📊 FINAL FONT SIZE:', bestFit + 'pt');
-      console.log('=== END DEBUG ===');
+      console.log('Final font size:', bestFit + 'pt');
       
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
@@ -398,7 +358,7 @@ function getDynamicSizingScript() {
         }
       });
       
-      // Handle P.S. message (rest of code stays the same)
+      // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
       const psInner = document.querySelector('.ps-message-inner');
       if (psMessage && psInner) {
@@ -436,6 +396,7 @@ function getDynamicSizingScript() {
         }
       }
       
+      // Handle date display font-weight - ONLY for Block font
       if (isBlockFont) {
         const dateDisplay = document.querySelector('.date-display');
         if (dateDisplay) {
@@ -896,6 +857,7 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
+
 
 
 
