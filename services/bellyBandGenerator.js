@@ -3,6 +3,32 @@ const chromium = require('@sparticuz/chromium');
 const fs = require('fs').promises;
 const path = require('path');
 
+// Convert string to Title Case
+function toTitleCase(str) {
+  if (!str) return str;
+  
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => {
+      // Handle special cases like McDonald, O'Brien, etc.
+      if (word.includes("'")) {
+        return word.split("'")
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join("'");
+      }
+      // Handle hyphenated names like Mary-Jane
+      if (word.includes("-")) {
+        return word.split("-")
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join("-");
+      }
+      // Standard title case
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+}
+
 // Convert file to base64
 async function fileToBase64(filePath) {
   try {
@@ -223,8 +249,11 @@ async function generateBellyBand(orderData) {
   
   const cleanOrderNumber = orderData.orderNumber.replace('#', '');
   
-  // Use shipping first name from order data
-  const displayName = orderData.shippingFirstName || orderData.customerName || 'Dear Friend';
+  // Use shipping first name from order data and convert to Title Case
+  const rawName = orderData.shippingFirstName || orderData.customerName || 'Dear Friend';
+  const displayName = toTitleCase(rawName);
+  
+  console.log('📝 Formatted Name:', displayName, '(from:', rawName, ')');
   
   const browser = await puppeteer.launch({
     args: chromium.args,
@@ -248,7 +277,7 @@ async function generateBellyBand(orderData) {
       height: 1123  // 297mm at 96 DPI
     });
     
-    // Generate HTML with shipping first name
+    // Generate HTML with Title Case shipping first name
     const html = await generateBellyBandHTML(
       displayName,
       griffithsBase64,
