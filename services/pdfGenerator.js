@@ -286,6 +286,9 @@ function getDynamicSizingScript() {
       const isFancy = document.querySelector('.fancy-font') !== null;
       const isBlockFont = document.querySelector('.block-font') !== null;
       
+      // Ensure predictable box model
+      container.style.boxSizing = 'border-box';
+      
       // Check if content contains specific template text
       const letterText = container.innerText || container.textContent || '';
       const isSnowGlobeHeart = letterText.toLowerCase().includes('snow globe heart');
@@ -317,6 +320,7 @@ function getDynamicSizingScript() {
       let high = maxSize;
       let bestFit = fontSize;
       
+      // Binary search for largest font size that fits
       for (let attempts = 0; attempts < 25; attempts++) {
         const mid = (low + high) / 2;
         
@@ -379,45 +383,50 @@ function getDynamicSizingScript() {
         }
       });
 
-      // === BOTTOM ALIGN: push text down so last line sits near bottom of box ===
-      (function alignToBottomWithSafeGap() {
-        const containerStyle = window.getComputedStyle(container);
-        const currentPaddingTop = parseFloat(containerStyle.paddingTop) || 0;
-        const currentPaddingBottom = parseFloat(containerStyle.paddingBottom) || 0;
-
-        const containerHeight = container.clientHeight;          // includes current paddings
-        const contentHeight = container.scrollHeight;            // height of text content
-        const innerHeight = containerHeight - currentPaddingTop - currentPaddingBottom;
-        const space = innerHeight - contentHeight;               // free vertical space
-
-        if (space <= 0) {
-          // Text already fills or slightly exceeds available inner height. Do nothing.
+      // === CONDITIONAL BOTTOM ALIGNMENT FOR SMALLER FONTS ===
+      (function maybeBottomAlign() {
+        // If the font stayed relatively big, keep current behaviour (top-ish).
+        const bigThreshold = isFancy ? 24 : 26; // tune if needed
+        if (bestFit >= bigThreshold) {
+          console.log('Font large enough, skip bottom-align. bestFit=', bestFit);
           return;
         }
 
-        // Minimum gap to always keep between the last line and the bottom edge of the box.
-        // Think "buffer above where the signature area visually begins".
-        const minBottomGapPx = 40; // tweak between ~30–60px to taste
+        console.log('Applying bottom-align flex layout, bestFit=', bestFit);
 
-        if (space <= minBottomGapPx) {
-          // Not much spare room – natural top alignment is fine.
-          return;
+        // Turn the container into a flex column
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.justifyContent = 'flex-end'; // push paragraphs to the bottom
+        container.style.alignItems = 'flex-start';
+
+        // After switching to flex, recheck height and gently shrink if needed
+        function fits() {
+          // Measure again with flex active
+          const ch = container.clientHeight;
+          const sh = container.scrollHeight;
+          console.log('Flex fit check: clientHeight=', ch, 'scrollHeight=', sh);
+          return sh <= ch;
         }
 
-        // We have extra space. To bottom-align:
-        // - Keep minBottomGapPx at the bottom,
-        // - Put the remaining free space at the top as padding-top.
-        const extraTop = space - minBottomGapPx;
+        if (!fits()) {
+          // If flex layout caused overflow, gently shrink font until it fits
+          for (let i = 0; i < 8; i++) {
+            let currentSize = bestFit;
+            currentSize -= 0.3;
+            bestFit = currentSize;
 
-        const newPaddingTop = currentPaddingTop + extraTop;
-        container.style.paddingTop = newPaddingTop + 'px';
+            container.querySelectorAll('p').forEach(p => {
+              p.style.fontSize = currentSize + 'pt';
+              p.style.lineHeight = isFancy ? '1.15' : '1.3';
+            });
 
-        console.log('Bottom-align: containerHeight=', containerHeight,
-          'contentHeight=', contentHeight,
-          'innerHeight=', innerHeight,
-          'space=', space,
-          'extraTop=', extraTop,
-          'final paddingTop=', newPaddingTop);
+            container.offsetHeight;
+            if (fits()) break;
+          }
+        }
+
+        console.log('Bottom-align applied with final bestFit=', bestFit);
       })();
       
       // Handle P.S. message
@@ -533,8 +542,6 @@ function getEnvelopeScript() {
         nameElement.style.fontSize = nameFontSize + 'pt';
         
         // DO NOT override address font size - let CSS handle it (19pt)
-        // REMOVED: addressElement.style.fontSize = '19pt';
-        
         console.log('📏 Using name font size:', nameFontSize + 'pt');
         console.log('📏 Address uses CSS default: 19pt');
         
