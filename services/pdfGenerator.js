@@ -369,7 +369,7 @@ function getDynamicSizingScript() {
       
       console.log('Initial font size:', bestFit + 'pt');
       
-      // ==== NEW: PROPORTIONAL LINE SPACING ====
+      // ==== PROPORTIONAL LINE SPACING WITH SMART GAP REDUCTION ====
       // Calculate how much the font was scaled down
       const fontScaleRatio = bestFit / maxSize;
       
@@ -383,8 +383,8 @@ function getDynamicSizingScript() {
         // This creates a smooth gradient from 1.0x to 2.0x line height increase
         lineHeightMultiplier = 2.0 - fontScaleRatio;
         
-        // Cap the maximum line height increase
-        if (lineHeightMultiplier > 2.2) lineHeightMultiplier = 2.2;
+        // Cap the maximum line height increase for natural appearance
+        if (lineHeightMultiplier > 2.0) lineHeightMultiplier = 2.0; // Reduced from 2.2 to 2.0
         if (lineHeightMultiplier < 1.0) lineHeightMultiplier = 1.0;
       }
       
@@ -406,22 +406,31 @@ function getDynamicSizingScript() {
         }
       });
       
-      // Check if we need to fine-tune after applying new line height
+      // ==== SMART GAP REDUCTION ====
+      // After applying proportional spacing, check if there's still a gap
+      // and apply a small top padding to center the content better
+      container.offsetHeight;
       const finalContentHeight = container.scrollHeight;
-      const finalContainerHeight = container.clientHeight;
+      const containerHeight = container.clientHeight;
+      const remainingGap = containerHeight - finalContentHeight;
       
-      if (finalContentHeight > finalContainerHeight * 1.05) {
-        // If we overflowed with increased line spacing, dial it back
-        const adjustment = finalContainerHeight / finalContentHeight;
-        const adjustedLineHeight = finalLineHeight * adjustment * 0.95; // 95% to ensure fit
-        
-        container.querySelectorAll('p').forEach(p => {
-          p.style.lineHeight = adjustedLineHeight.toString();
-        });
-        
-        console.log('Adjusted line height for overflow:', adjustedLineHeight.toFixed(2));
+      // If there's a gap, push content down by half of it (centering vertically)
+      // but only if the gap is reasonable (not too large)
+      if (remainingGap > 10 && remainingGap < 100) {
+        // Push down by 40% of the gap (not 50% to keep it slightly top-weighted)
+        const topPadding = remainingGap * 0.4;
+        container.style.paddingTop = topPadding + 'px';
+        container.style.boxSizing = 'border-box';
+        console.log('Applied smart padding:', topPadding.toFixed(1) + 'px to reduce gap');
+      } else if (remainingGap >= 100) {
+        // For very large gaps, apply a fixed maximum padding
+        container.style.paddingTop = '40px';
+        container.style.boxSizing = 'border-box';
+        console.log('Applied maximum padding: 40px for large gap');
       }
-      // ==== END PROPORTIONAL LINE SPACING ====
+      
+      console.log('Final gap to signature:', remainingGap.toFixed(1) + 'px');
+      // ==== END SMART GAP REDUCTION ====
       
       // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
