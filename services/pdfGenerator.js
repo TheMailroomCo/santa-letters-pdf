@@ -379,63 +379,45 @@ function getDynamicSizingScript() {
         }
       });
 
-      // === GAP NORMALISATION: gently increase line-height to reduce huge bottom gaps ===
-      (function normaliseVerticalGap() {
-        const baseLineHeight = isFancy ? 1.15 : 1.3;
+      // === BOTTOM ALIGN: push text down so last line sits near bottom of box ===
+      (function alignToBottomWithSafeGap() {
+        const containerStyle = window.getComputedStyle(container);
+        const currentPaddingTop = parseFloat(containerStyle.paddingTop) || 0;
+        const currentPaddingBottom = parseFloat(containerStyle.paddingBottom) || 0;
 
-        const containerHeight = container.clientHeight;
-        const contentHeight = container.scrollHeight;
-        const gap = containerHeight - contentHeight;
+        const containerHeight = container.clientHeight;          // includes current paddings
+        const contentHeight = container.scrollHeight;            // height of text content
+        const innerHeight = containerHeight - currentPaddingTop - currentPaddingBottom;
+        const space = innerHeight - contentHeight;               // free vertical space
 
-        if (gap <= 0) {
-          // Already snug or slightly overflowing – do nothing
+        if (space <= 0) {
+          // Text already fills or slightly exceeds available inner height. Do nothing.
           return;
         }
 
-        // Minimum gap to always keep at the bottom (breathing room above signature)
-        const minRemainingGapPx = 40; // tweak between ~30–60 to taste
+        // Minimum gap to always keep between the last line and the bottom edge of the box.
+        // Think "buffer above where the signature area visually begins".
+        const minBottomGapPx = 40; // tweak between ~30–60px to taste
 
-        if (gap <= minRemainingGapPx) {
-          // Gap is already reasonable
+        if (space <= minBottomGapPx) {
+          // Not much spare room – natural top alignment is fine.
           return;
         }
 
-        // Extra space we can "spend"
-        const maxExtra = gap - minRemainingGapPx;
+        // We have extra space. To bottom-align:
+        // - Keep minBottomGapPx at the bottom,
+        // - Put the remaining free space at the top as padding-top.
+        const extraTop = space - minBottomGapPx;
 
-        // Approximate safe scale factor for line-height:
-        // newHeight ≈ contentHeight * k <= contentHeight + maxExtra
-        // => kApprox = 1 + maxExtra / contentHeight
-        const kApprox = 1 + (maxExtra / contentHeight);
+        const newPaddingTop = currentPaddingTop + extraTop;
+        container.style.paddingTop = newPaddingTop + 'px';
 
-        // Hard maximum stretch factor to avoid weird airy lines
-        const kMax = isFancy ? 1.10 : 1.18; // fancy = tighter, block can loosen a bit more
-        let k = Math.min(kApprox, kMax);
-
-        if (k <= 1.02) {
-          // Change is negligible (<2%) – keep things consistent
-          return;
-        }
-
-        console.log('Gap normalisation: gap=', gap, 'contentHeight=', contentHeight, 'kApprox=', kApprox, 'k=', k);
-
-        // Apply scaled line-height
-        container.querySelectorAll('p').forEach(p => {
-          p.style.lineHeight = (baseLineHeight * k).toFixed(3);
-        });
-
-        // Re-measure after adjustment
-        const newContentHeight = container.scrollHeight;
-
-        if (newContentHeight > containerHeight) {
-          // Overshot slightly – scale line-height down just enough to fit with a small safety buffer
-          const safetyRatio = (containerHeight / newContentHeight) * 0.98; // 2% safety margin
-          console.log('Gap normalisation overshoot: scaling line-height by', safetyRatio);
-          container.querySelectorAll('p').forEach(p => {
-            const current = parseFloat(p.style.lineHeight) || (baseLineHeight * k);
-            p.style.lineHeight = (current * safetyRatio).toFixed(3);
-          });
-        }
+        console.log('Bottom-align: containerHeight=', containerHeight,
+          'contentHeight=', contentHeight,
+          'innerHeight=', innerHeight,
+          'space=', space,
+          'extraTop=', extraTop,
+          'final paddingTop=', newPaddingTop);
       })();
       
       // Handle P.S. message
