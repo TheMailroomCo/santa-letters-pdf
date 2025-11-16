@@ -276,7 +276,7 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Dynamic text sizing script for letters
+// Dynamic text sizing script for letters - UPDATED WITH BOTTOM ALIGNMENT
 function getDynamicSizingScript() {
   return `
     setTimeout(() => {
@@ -376,6 +376,28 @@ function getDynamicSizingScript() {
           p.style.fontFamily = 'LilyWang, cursive';
         }
       });
+      
+      // ==== NEW: BOTTOM ALIGN THE CONTENT ====
+      // After sizing is complete, calculate vertical positioning
+      const actualContentHeight = container.scrollHeight;
+      const availableHeight = container.clientHeight;
+      
+      if (actualContentHeight < availableHeight) {
+        // There's extra space - push content to bottom
+        const topPadding = availableHeight - actualContentHeight;
+        
+        // Apply padding to push content down
+        container.style.paddingTop = topPadding + 'px';
+        container.style.boxSizing = 'border-box';
+        
+        console.log('Bottom alignment applied - padding:', topPadding + 'px');
+        console.log('Content height:', actualContentHeight + 'px, Available:', availableHeight + 'px');
+      } else {
+        // Content fills the space - no padding needed
+        container.style.paddingTop = '0';
+        console.log('Content fills container - no bottom alignment needed');
+      }
+      // ==== END BOTTOM ALIGN ====
       
       // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
@@ -885,16 +907,3 @@ module.exports = {
   fetchTemplate,
   processTemplateContent
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
