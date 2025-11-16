@@ -276,7 +276,7 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Dynamic text sizing script for letters
+// Dynamic text sizing script with PROPORTIONAL LINE SPACING
 function getDynamicSizingScript() {
   return `
     setTimeout(() => {
@@ -313,6 +313,8 @@ function getDynamicSizingScript() {
         console.log('Family Letter Block: Using minSize=13, starting=35');
       }
       
+      // First pass: Find the best font size with standard line height
+      const baseLineHeight = isFancy ? 1.15 : 1.3;
       let low = minSize;
       let high = maxSize;
       let bestFit = fontSize;
@@ -322,7 +324,7 @@ function getDynamicSizingScript() {
         
         container.querySelectorAll('p').forEach(p => {
           p.style.fontSize = mid + 'pt';
-          p.style.lineHeight = isFancy ? '1.15' : '1.3';
+          p.style.lineHeight = baseLineHeight.toString();
           if (isBlockFont) {
             p.classList.add('block-font-bold');
           } else if (isFancy) {
@@ -365,17 +367,70 @@ function getDynamicSizingScript() {
         console.log('Forcing minimum 11.5pt for Family Letter Block font');
       }
       
-      console.log('Final font size:', bestFit + 'pt');
+      console.log('Initial font size:', bestFit + 'pt');
       
+      // ==== PROPORTIONAL LINE SPACING WITH SMART GAP REDUCTION ====
+      // Calculate how much the font was scaled down
+      const fontScaleRatio = bestFit / maxSize;
+      
+      // When font is smaller, increase line spacing to fill vertical space
+      // Map font scale (0.24 to 1) to line height multiplier
+      let lineHeightMultiplier = 1;
+      
+      if (fontScaleRatio < 0.7) {
+        // For significantly scaled down text, increase line spacing
+        // The smaller the font, the more we increase line spacing
+        // This creates a smooth gradient from 1.0x to 2.0x line height increase
+        lineHeightMultiplier = 2.0 - fontScaleRatio;
+        
+        // Cap the maximum line height increase for natural appearance
+        if (lineHeightMultiplier > 2.0) lineHeightMultiplier = 2.0; // Reduced from 2.2 to 2.0
+        if (lineHeightMultiplier < 1.0) lineHeightMultiplier = 1.0;
+      }
+      
+      // Apply final line height
+      const finalLineHeight = baseLineHeight * lineHeightMultiplier;
+      
+      console.log('Font scale ratio:', fontScaleRatio.toFixed(2));
+      console.log('Line height multiplier:', lineHeightMultiplier.toFixed(2));
+      console.log('Final line height:', finalLineHeight.toFixed(2));
+      
+      // Apply final font size and calculated line height
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
-        p.style.lineHeight = isFancy ? '1.15' : '1.3';
+        p.style.lineHeight = finalLineHeight.toString();
         if (isBlockFont) {
           p.classList.add('block-font-bold');
         } else if (isFancy) {
           p.style.fontFamily = 'LilyWang, cursive';
         }
       });
+      
+      // ==== SMART GAP REDUCTION ====
+      // After applying proportional spacing, check if there's still a gap
+      // and apply a small top padding to center the content better
+      container.offsetHeight;
+      const finalContentHeight = container.scrollHeight;
+      const containerHeight = container.clientHeight;
+      const remainingGap = containerHeight - finalContentHeight;
+      
+      // If there's a gap, push content down by half of it (centering vertically)
+      // but only if the gap is reasonable (not too large)
+      if (remainingGap > 10 && remainingGap < 100) {
+        // Push down by 40% of the gap (not 50% to keep it slightly top-weighted)
+        const topPadding = remainingGap * 0.4;
+        container.style.paddingTop = topPadding + 'px';
+        container.style.boxSizing = 'border-box';
+        console.log('Applied smart padding:', topPadding.toFixed(1) + 'px to reduce gap');
+      } else if (remainingGap >= 100) {
+        // For very large gaps, apply a fixed maximum padding
+        container.style.paddingTop = '40px';
+        container.style.boxSizing = 'border-box';
+        console.log('Applied maximum padding: 40px for large gap');
+      }
+      
+      console.log('Final gap to signature:', remainingGap.toFixed(1) + 'px');
+      // ==== END SMART GAP REDUCTION ====
       
       // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
