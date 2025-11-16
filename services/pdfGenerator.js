@@ -276,7 +276,7 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Dynamic text sizing script for letters - UPDATED WITH BOTTOM ALIGNMENT
+// Dynamic text sizing script with PROPORTIONAL LINE SPACING
 function getDynamicSizingScript() {
   return `
     setTimeout(() => {
@@ -313,6 +313,8 @@ function getDynamicSizingScript() {
         console.log('Family Letter Block: Using minSize=13, starting=35');
       }
       
+      // First pass: Find the best font size with standard line height
+      const baseLineHeight = isFancy ? 1.15 : 1.3;
       let low = minSize;
       let high = maxSize;
       let bestFit = fontSize;
@@ -322,7 +324,7 @@ function getDynamicSizingScript() {
         
         container.querySelectorAll('p').forEach(p => {
           p.style.fontSize = mid + 'pt';
-          p.style.lineHeight = isFancy ? '1.15' : '1.3';
+          p.style.lineHeight = baseLineHeight.toString();
           if (isBlockFont) {
             p.classList.add('block-font-bold');
           } else if (isFancy) {
@@ -365,11 +367,38 @@ function getDynamicSizingScript() {
         console.log('Forcing minimum 11.5pt for Family Letter Block font');
       }
       
-      console.log('Final font size:', bestFit + 'pt');
+      console.log('Initial font size:', bestFit + 'pt');
       
+      // ==== NEW: PROPORTIONAL LINE SPACING ====
+      // Calculate how much the font was scaled down
+      const fontScaleRatio = bestFit / maxSize;
+      
+      // When font is smaller, increase line spacing to fill vertical space
+      // Map font scale (0.24 to 1) to line height multiplier
+      let lineHeightMultiplier = 1;
+      
+      if (fontScaleRatio < 0.7) {
+        // For significantly scaled down text, increase line spacing
+        // The smaller the font, the more we increase line spacing
+        // This creates a smooth gradient from 1.0x to 2.0x line height increase
+        lineHeightMultiplier = 2.0 - fontScaleRatio;
+        
+        // Cap the maximum line height increase
+        if (lineHeightMultiplier > 2.2) lineHeightMultiplier = 2.2;
+        if (lineHeightMultiplier < 1.0) lineHeightMultiplier = 1.0;
+      }
+      
+      // Apply final line height
+      const finalLineHeight = baseLineHeight * lineHeightMultiplier;
+      
+      console.log('Font scale ratio:', fontScaleRatio.toFixed(2));
+      console.log('Line height multiplier:', lineHeightMultiplier.toFixed(2));
+      console.log('Final line height:', finalLineHeight.toFixed(2));
+      
+      // Apply final font size and calculated line height
       container.querySelectorAll('p').forEach(p => {
         p.style.fontSize = bestFit + 'pt';
-        p.style.lineHeight = isFancy ? '1.15' : '1.3';
+        p.style.lineHeight = finalLineHeight.toString();
         if (isBlockFont) {
           p.classList.add('block-font-bold');
         } else if (isFancy) {
@@ -377,27 +406,22 @@ function getDynamicSizingScript() {
         }
       });
       
-      // ==== NEW: BOTTOM ALIGN THE CONTENT ====
-      // After sizing is complete, calculate vertical positioning
-      const actualContentHeight = container.scrollHeight;
-      const availableHeight = container.clientHeight;
+      // Check if we need to fine-tune after applying new line height
+      const finalContentHeight = container.scrollHeight;
+      const finalContainerHeight = container.clientHeight;
       
-      if (actualContentHeight < availableHeight) {
-        // There's extra space - push content to bottom
-        const topPadding = availableHeight - actualContentHeight;
+      if (finalContentHeight > finalContainerHeight * 1.05) {
+        // If we overflowed with increased line spacing, dial it back
+        const adjustment = finalContainerHeight / finalContentHeight;
+        const adjustedLineHeight = finalLineHeight * adjustment * 0.95; // 95% to ensure fit
         
-        // Apply padding to push content down
-        container.style.paddingTop = topPadding + 'px';
-        container.style.boxSizing = 'border-box';
+        container.querySelectorAll('p').forEach(p => {
+          p.style.lineHeight = adjustedLineHeight.toString();
+        });
         
-        console.log('Bottom alignment applied - padding:', topPadding + 'px');
-        console.log('Content height:', actualContentHeight + 'px, Available:', availableHeight + 'px');
-      } else {
-        // Content fills the space - no padding needed
-        container.style.paddingTop = '0';
-        console.log('Content fills container - no bottom alignment needed');
+        console.log('Adjusted line height for overflow:', adjustedLineHeight.toFixed(2));
       }
-      // ==== END BOTTOM ALIGN ====
+      // ==== END PROPORTIONAL LINE SPACING ====
       
       // Handle P.S. message
       const psMessage = document.querySelector('.ps-message');
